@@ -57,5 +57,16 @@ for no_cores in range(1,9):
 print(time_list)
 
 
+#speedup = []
+
+#for i in range(len(results)):
+#  speedup.append( origrinal_time/results[i] )
+
+#print(speedup)
+
+#plt.plot([1,2,3,4,5,6,7,8],speedup)
+#plt.xlabel("No of cores")
+#plt.ylabel("Speed-up")
+#plt.show()
 #plt.plot([1,2,3,4,5,6,7,8],time_list)
 #plt.show()
