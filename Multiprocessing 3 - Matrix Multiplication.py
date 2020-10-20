@@ -64,40 +64,15 @@ def gen_time_results(mat_size,max_cores,no_runs):
 
 
 
-def gen_results_graph(time_mat):
-    time_mat = np.array(time_mat)
-    av_time_list = time_mat.mean(axis = 1)
-    print(f'Average times: {av_time_list}')
-
-    origrinal_time = av_time_list[0]
-
-    my_speedup = []
-    no_cores = []
-
-    for i in range(1,len(av_time_list)+1):
-      my_speedup.append( origrinal_time/av_time_list[i-1] )
-      no_cores.append( i )
-
-    print(f'Average speedups: {my_speedup}')
-
-    #plt.plot(no_cores,my_speedup, label = "Actual")
-    #plt.plot(no_cores,no_cores, label = "Ideal")
-    #plt.xlabel("No of cores")
-    #plt.ylabel("Speed-up")
-    #plt.legend()
-    #plt.show()
-
-
-
 def main():
     mat_size = 840 #chosen to be 8! so the work can be divided up nicely for any number of cores from 1-8
     max_cores = 40
     no_runs = 20 #the code will run on each number of cores this many times
     
-    time_results, no_correct = gen_time_results(mat_size,max_cores,no_runs)
+    time_results = gen_time_results(mat_size,max_cores,no_runs)
 
-    no_incorrect = no_runs*max_cores - no_correct
-    print(f'No correct: {no_correct},  No incorrect: {no_incorrect}')
+    #no_incorrect = no_runs*max_cores - no_correct
+    #print(f'No correct: {no_correct},  No incorrect: {no_incorrect}')
 
     gen_results_graph(time_results)
 
