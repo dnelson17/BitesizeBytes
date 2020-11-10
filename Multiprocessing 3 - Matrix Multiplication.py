@@ -65,16 +65,16 @@ def gen_time_results(mat_size,max_cores,no_runs):
 
 
 def main():
-    mat_size = 840 #chosen to be 8! so the work can be divided up nicely for any number of cores from 1-8
+    mat_size = 84000 #chosen to be 8! so the work can be divided up nicely for any number of cores from 1-8
     max_cores = 40
     no_runs = 20 #the code will run on each number of cores this many times
     
-    time_results = gen_time_results(mat_size,max_cores,no_runs)
+    #time_results = gen_time_results(mat_size,max_cores,no_runs)
 
     #no_incorrect = no_runs*max_cores - no_correct
     #print(f'No correct: {no_correct},  No incorrect: {no_incorrect}')
 
-    gen_results_graph(time_results)
+    #gen_results_graph(time_results)
 
 
 main()
