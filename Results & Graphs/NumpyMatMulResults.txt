@@ -1,0 +1,24 @@
+Matrix size
+32
+Run time
+5e-07
+Matrix size
+64
+Run time
+0.00010100000000000186
+Matrix size
+128
+Run time
+0.0007248000000000175
+Matrix size
+256
+Run time
+0.004556900000000016
+Matrix size
+512
+Run time
+0.03259639999999957
+Matrix size
+1024
+Run time
+0.2565851999999997

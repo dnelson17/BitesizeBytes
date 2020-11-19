@@ -74,7 +74,7 @@ def main():
     #no_incorrect = no_runs*max_cores - no_correct
     #print(f'No correct: {no_correct},  No incorrect: {no_incorrect}')
 
-    #gen_results_graph(time_results)
+    #gen_time_file(time_results)
 
 
 main()
