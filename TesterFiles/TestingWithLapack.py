@@ -2,8 +2,11 @@ from multiprocessing import Pool
 import time
 import numpy as np
 from scipy.linalg import blas as FB
+import os
 
-#python3 main_tester_lapack.py
+os.system("taskset -p 0xff %d" % os.getpid())
+
+#python3 TestingWithLapack.py
 
 def check_answer(mat_A,mat_B,mat_C):
     answer = FB.sgemm(alpha=1.0, a=mat_A, b=mat_B)
@@ -28,7 +31,6 @@ def gen_time_results(mat_size,max_cores,no_runs):
         for _ in range(no_runs):
             mat_A = np.random.rand(mat_size,mat_size)
             mat_B = np.random.rand(mat_size,mat_size)
-            result = mat_C
             start = time.perf_counter()
             param = []
             if __name__ == '__main__':
@@ -63,12 +65,13 @@ def gen_results_graph(time_mat):
 
 
 def main():
-    size_list = [32,64,128,256,512,1024]#,2048,4096,8192]
+    #size_list = [32,64,128,256,512,1024,2048,4096,8192]
+    size_list = [2048,4096,8192,16384,32768]
     total = 0
     for mat_size in size_list:
         print(f"Matrix size: {mat_size}")
         max_cores = 32
-        no_runs = 10
+        no_runs = 1
         time_results, no_correct = gen_time_results(mat_size,max_cores,no_runs)
         gen_results_graph(time_results)
         no_incorrect = no_runs*max_cores - no_correct
@@ -79,4 +82,3 @@ def main():
 
 
 main()
-
