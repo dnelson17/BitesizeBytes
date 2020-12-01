@@ -2,9 +2,7 @@ from multiprocessing import Pool
 import time
 import numpy as np
 from scipy.linalg import blas as FB
-import os
 
-os.system("taskset -p 0xff %d" % os.getpid())
 
 #python3 TestingWithLapack.py
 
@@ -65,12 +63,12 @@ def gen_results_graph(time_mat):
 
 
 def main():
-    #size_list = [32,64,128,256,512,1024,2048,4096,8192]
-    size_list = [2048,4096,8192,16384,32768]
+    size_list = [32,64,128,256,512,1024]
+    #size_list = [2048,4096,8192,16384,32768]
     total = 0
     for mat_size in size_list:
         print(f"Matrix size: {mat_size}")
-        max_cores = 32
+        max_cores = 8
         no_runs = 1
         time_results, no_correct = gen_time_results(mat_size,max_cores,no_runs)
         gen_results_graph(time_results)
