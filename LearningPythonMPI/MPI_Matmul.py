@@ -4,8 +4,7 @@ import numpy as np
 from scipy.linalg import blas as FB
 import sys
 
-# /usr/bin/mpiexec -n 4 python BitesizeBytes/LearningPythonMPI/MPI_Matmul.py
-
+# /usr/bin/mpiexec -n 5 python3 MPI_Matmul.py 32 32
 
 numberRows = int( sys.argv[1])
 numberColumns = int( sys.argv[2])
@@ -30,7 +29,7 @@ processorName = MPI.Get_processor_name()
 if (worldSize == 1):
     slice = numberRows
 else:
-    slice = numberRows / (worldSize-1) #make sure it is divisible
+    slice = int(numberRows / (worldSize-1)) #make sure it is divisible
 
 assert slice >= 1
 
@@ -43,6 +42,7 @@ if rank == TaskMaster:
         
     for i in range(1, worldSize):
         offset = (i-1)*slice #0, 10, 20
+        print(offset)
         row = mat_A[offset,:]
         comm.send(offset, dest=i, tag=i)
         comm.send(row, dest=i, tag=i)
