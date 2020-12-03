@@ -78,7 +78,7 @@ if rank != TaskMaster:
                 res[j] = res[j] + (r[x]*q[x])
             ai = ai + 1
         if (i > 0):
-           send = np.vstack((send, res))
+            send = np.vstack((send, res))
         else:
             send = res
     t_diff = MPI.Wtime() - t_start
