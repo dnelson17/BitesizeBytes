@@ -83,6 +83,7 @@ if rank != TaskMaster:
     t_diff = MPI.Wtime() - t_start
 
     print("Process %d finished in %5.4fs.\n" %(rank, t_diff))
+    print("0")
     #Send large data
     #print ("Sending results to Master %d bytes.\n" % (send.nbytes))
     comm.Send([send, MPI.FLOAT], dest=0, tag=rank) #1, 12, 23
