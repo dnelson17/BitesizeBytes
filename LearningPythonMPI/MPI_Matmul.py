@@ -52,41 +52,39 @@ if rank == TaskMaster:
 
 comm.Barrier()
 
-if rank != TaskMaster:
+#print ("Data Received from process %d.\n" % (rank))
+offset = comm.recv(source=0, tag=rank)
+recv_data = comm.recv(source=0, tag=rank)
+for j in range(1, slice):
+    mat_C = comm.recv(source=0, tag=j+offset)
+    recv_data = np.vstack((recv_data, mat_C))
 
-    #print ("Data Received from process %d.\n" % (rank))
-    offset = comm.recv(source=0, tag=rank)
-    recv_data = comm.recv(source=0, tag=rank)
-    for j in range(1, slice):
-        mat_C = comm.recv(source=0, tag=j+offset)
-        recv_data = np.vstack((recv_data, mat_C))
+#print ("Start Calculation from process %d.\n" % (rank))
 
-    #print ("Start Calculation from process %d.\n" % (rank))
+#Loop through rows
+t_start = MPI.Wtime()
+for i in range(0, slice):
+    res = np.zeros(shape=(numberColumns))
+    if (slice == 1):
+        r = recv_data
+    else:
+        r = recv_data[i,:]
+    ai = 0
+    for j in range(0, numberColumns):
+        q = mat_B[:,j] #get the column we want
+        for x in range(0, numberColumns):
+            res[j] = res[j] + (r[x]*q[x])
+        ai = ai + 1
+    if (i > 0):
+        send = np.vstack((send, res))
+    else:
+        send = res
+t_diff = MPI.Wtime() - t_start
 
-    #Loop through rows
-    t_start = MPI.Wtime()
-    for i in range(0, slice):
-        res = np.zeros(shape=(numberColumns))
-        if (slice == 1):
-            r = recv_data
-        else:
-            r = recv_data[i,:]
-        ai = 0
-        for j in range(0, numberColumns):
-            q = mat_B[:,j] #get the column we want
-            for x in range(0, numberColumns):
-                res[j] = res[j] + (r[x]*q[x])
-            ai = ai + 1
-        if (i > 0):
-            send = np.vstack((send, res))
-        else:
-            send = res
-    t_diff = MPI.Wtime() - t_start
-    
-    print("Process %d finished in %5.4fs.\n" %(rank, t_diff))
-    #Send large data
-    #print ("Sending results to Master %d bytes.\n" % (send.nbytes))
-    comm.Send([send, MPI.FLOAT], dest=0, tag=rank) #1, 12, 23
+print("Process %d finished in %5.4fs.\n" %(rank, t_diff))
+#Send large data
+#print ("Sending results to Master %d bytes.\n" % (send.nbytes))
+comm.Send([send, MPI.FLOAT], dest=0, tag=rank) #1, 12, 23
 
 comm.Barrier()
 
