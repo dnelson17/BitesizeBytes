@@ -89,8 +89,8 @@ if rank != TaskMaster:
     comm.Send([send, MPI.FLOAT], dest=0, tag=rank) #1, 12, 23
     print("1")
 
-comm.Barrier()
-print("2")
+#comm.Barrier()
+#print("2")
 
 if rank == TaskMaster:  
     #print ("Checking response from Workers.\n")
