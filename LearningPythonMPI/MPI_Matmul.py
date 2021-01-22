@@ -12,6 +12,8 @@ TaskMaster = 0
 
 assert numberRows == numberColumns
 
+print(numberRows)
+
 #print ("Initialising variables.\n")
 mat_A = np.random.rand(numberRows,numberColumns)
 mat_B = np.random.rand(numberRows,numberColumns)
