@@ -30,17 +30,17 @@ if (worldSize == 1):
     slice = numberRows
 else:
     slice = int(numberRows / (worldSize-1)) #make sure it is divisible
-
 assert slice >= 1
 
 
-comm.Barrier()
+#comm.Barrier()
     
 if rank == TaskMaster:
     #print ("Initialising Matrix A and B (%d,%d).\n" % (numberRows, numberColumns))
     print ("Start")
         
     for i in range(1, worldSize):
+        print("a")
         offset = (i-1)*slice #0, 10, 20
         print(offset)
         row = mat_A[offset,:]
@@ -49,16 +49,19 @@ if rank == TaskMaster:
         for j in range(0, slice):
             comm.send(mat_A[j+offset,:], dest=i, tag=j+offset)
     #print ("All sent to workers.\n")
+    print("b")
 
-comm.Barrier()
+#comm.Barrier()
 
 if rank != TaskMaster:
     #print ("Data Received from process %d.\n" % (rank))
     offset = comm.recv(source=0, tag=rank)
     recv_data = comm.recv(source=0, tag=rank)
+    print("c")
     for j in range(1, slice):
         mat_C = comm.recv(source=0, tag=j+offset)
         recv_data = np.vstack((recv_data, mat_C))
+    print("d")
 
     #print ("Start Calculation from process %d.\n" % (rank))
 
@@ -83,25 +86,25 @@ if rank != TaskMaster:
     t_diff = MPI.Wtime() - t_start
 
     print("Process %d finished in %5.4fs.\n" %(rank, t_diff))
-    print("0")
+    print("e")
     #Send large data
     #print ("Sending results to Master %d bytes.\n" % (send.nbytes))
     comm.Send([send, MPI.FLOAT], dest=0, tag=rank) #1, 12, 23
-    print("1")
+    print("f")
 
 #comm.Barrier()
 #print("2")
 
 if rank == TaskMaster:  
     #print ("Checking response from Workers.\n")
-    print("3")
+    print("g")
     res1 = np.zeros(shape=(slice, numberColumns))
     comm.Recv([res1, MPI.FLOAT], source=1, tag=1)
     #print ("Received response from 1.\n")
-    print("4")
+    print("h")
     kl = np.vstack((res1))
     for i in range(2, worldSize):
-        print("5")
+        print("i")
         resx= np.zeros(shape=(slice, numberColumns))
         comm.Recv([resx, MPI.FLOAT], source=i, tag=i)
         #print ("Received response from %d.\n" % (i))
@@ -110,4 +113,5 @@ if rank == TaskMaster:
     #print ("Result AxB.\n")
     #print (kl)   
 
-comm.Barrier()
+#comm.Barrier()
+
