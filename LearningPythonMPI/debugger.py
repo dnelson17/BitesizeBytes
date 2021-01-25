@@ -6,6 +6,11 @@ import sys
 
 # /usr/bin/mpiexec -n 5 python3 MPI_Matmul.py 32 32
 
+def my_program(*args, **kwargs):
+    # insert your code here
+    pass
+
+
 numberRows = int( sys.argv[1])
 numberColumns = int( sys.argv[2])
 TaskMaster = 0
@@ -35,27 +40,25 @@ else:
 assert slice >= 1
 
 
-comm.Barrier()
+#comm.Barrier()
     
 if rank == TaskMaster:
     #print ("Initialising Matrix A and B (%d,%d).\n" % (numberRows, numberColumns))
     print ("Start")
         
     for i in range(1, worldSize):
-        print("a1")
+        print("a")
         offset = (i-1)*slice #0, 10, 20
         print(offset)
         row = mat_A[offset,:]
         comm.send(offset, dest=i, tag=i)
         comm.send(row, dest=i, tag=i)
-        print("a2")
         for j in range(0, slice):
             comm.send(mat_A[j+offset,:], dest=i, tag=j+offset)
-        print("a3")
     #print ("All sent to workers.\n")
     print("b")
 
-comm.Barrier()
+#comm.Barrier()
 
 if rank != TaskMaster:
     #print ("Data Received from process %d.\n" % (rank))
