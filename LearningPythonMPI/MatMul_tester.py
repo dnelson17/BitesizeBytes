@@ -93,5 +93,3 @@ if rank == TaskMaster:
         kl = np.vstack((kl, resx))
 
 #comm.Barrier()
-
-print("")
