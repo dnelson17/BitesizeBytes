@@ -21,13 +21,11 @@ for time in times:
     new_time.append(int(temp[1])-1)
     sum = 0
     for j in range(2,len(temp)):
-        sum += float(temp[j])
-    new_time.append(sum/new_time[1])
+        temp[j] = float(temp[j])
+    new_time.append(max(temp[2:]))
     data.append(new_time)
 
 final_times = [[]]
-print(data)
-print(data[0][0])
 
 current_mat_size = data[0][0]
 for i in range(0,len(data)):
@@ -46,6 +44,8 @@ for i in range(len(final_times)):
   speedup_mat.append([])
   for j in range(len(final_times[i])):
     speedup_mat[i].append( final_times[i][0] / final_times[i][j] )
+
+print(speedup_mat)
 
 no_cores = [1,2,4,8]
 
