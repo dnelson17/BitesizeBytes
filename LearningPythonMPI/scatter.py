@@ -2,35 +2,38 @@ from mpi4py import MPI
 import time
 import numpy as np
 from scipy.linalg import blas as FB
-import sys
-import numpy
-from math import acos, cos
-from mpi4py import MPI
+import sys 
+
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-def integral(a_i, h, n):
-    integ = 0.0
-    for j in range(n):
-        a_ij = a_i + (j + 0.5) * h
-        integ += cos(a_ij) * h
-    return integ
+def matrix_mult(first_row, last_row, mat_A, mat_B):
+    mat_C = np.zeros(mat_B.shape)
+    for i in range(first_row, last_row):
+        for j in range(mat_size):
+            for k in range(mat_size):
+                mat_C[i,j] += mat_A[i][k] * mat_B[k][j]
+    return mat_C
 
-pi = 3.14159265359
-a = 0.0
-b = pi / 2.0
-dest = 0
-my_int = numpy.zeros(1)
-integral_sum = numpy.zeros(1)
 
-# Initialize value of n only if this is rank 0
+numberRows = int( sys.argv[1])
+numberColumns = int( sys.argv[2])
+
+assert numberRows == numberColumns
+
+# Initialize the 2 random matrices only if this is rank 0
 if rank == 0:
-    n = numpy.full(1, 500, dtype=int) # default value
+    mat_A = np.random.rand(mat_size,mat_size)
+    mat_B = np.random.rand(mat_size,mat_size)
 else:
-    n = numpy.zeros(1, dtype=int)
+    n = None
 
-# Broadcast n to all processes
+
+
+
+
+# Scatter matrices to all processes
 print("Process ", rank, " before n = ", n[0])
 comm.Bcast(n, root=0)
 print("Process ", rank, " after n = ", n[0])
