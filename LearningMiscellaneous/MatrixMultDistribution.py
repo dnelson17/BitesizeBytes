@@ -28,8 +28,8 @@ def tester_1(size, mat_size):
 def tester_3(size, mat_size):
     #mat_A = np.random.rand(mat_size,mat_size)
     #mat_B = np.random.rand(mat_size,mat_size)
-    mat_A = np.reshape(np.arange(mat_size**2),[mat_size,mat_size])
-    mat_B = np.reshape(np.arange(mat_size**2,2*mat_size**2),[mat_size,mat_size])
+    mat_A = np.arange(mat_size**2).reshape([mat_size,mat_size])
+    mat_B = np.arange(mat_size**2,2*mat_size**2).reshape([mat_size,mat_size])
     answer = np.matmul(mat_A,mat_B)
     print(mat_A)
     print(mat_B)
@@ -55,12 +55,16 @@ def tester_3(size, mat_size):
             print(f"i: {i}")
             print(f"j: {j}")
             print(f"Rank: {i*2 + j}")
-    return send_list
+    return send_list, answer
 
 
 #tester_2(4,8)
 print("\n\n")
-mat_list = tester_3(8,8)
+print("hello")
+mat_list, answer = tester_3(4,4)
+
+print(mat_list)
+print("\n\n")
 
 #print("\n\n\n\n\n")
 
@@ -75,4 +79,65 @@ for i in range(10):
     power = np.log2(n)/2
     print(f"power: {power}")
     print(np.arange(n).reshape(( int(2**np.ceil(power)) , int(2**np.floor(power)) )) )
+
+m0 = np.arange(4).reshape(2,2)
+m1 = np.arange(4,8).reshape(2,2)
+m2 = np.arange(8,12).reshape(2,2)
+m3 = np.arange(12,16).reshape(2,2)
+
+print(m0)
+print(m1)
+print(m2)
+print(m3)
+
+m = np.block([[m0,m1],[m2,m3]])
+
+print(m)
+
+a1 = np.concatenate((m0,m1,m2),axis=1)
+print("a1")
+print(a1)
+
+a2 = np.concatenate((a1,m3),axis=1)
+print("a2")
+print(a2)
+
+a3 = np.block([[a2],[a2]])
+print("a3")
+print(a3)
+
+a4 = np.block([[a3],[a2]])
+print("a4")
+print(a4)
+
+print("\n\n")
+
+
+res_list = np.zeros((2,2))
+print(res_list)
+print("\n")
+
+for pair in mat_list:
+    print(pair[0])
+    print(pair[1])
+    res = matrix_mult(pair[0],pair[1])
+    print(res)
+    res_list = np.concatenate((res_list,res),axis=1)
+    print(res_list)
+    print("")
+
+res_list = np.delete(res_list, (0,1,10,11))
+res_list = np.reshape(res_list, (2,8))
+print(res_list)
+    
+res_list = np.split(res_list, 2, axis=1)
+print(res_list)
+
+res_list = np.block([[res_list[0]],[res_list[1]]])
+print(res_list)
+
+
+print(answer)
+
+
 

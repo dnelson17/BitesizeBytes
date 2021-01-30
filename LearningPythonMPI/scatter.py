@@ -1,7 +1,6 @@
 from mpi4py import MPI
 import time
 import numpy as np
-from scipy.linalg import blas as FB
 import sys 
 
 comm = MPI.COMM_WORLD
