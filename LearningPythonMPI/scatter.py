@@ -52,7 +52,7 @@ mats = comm.scatter(send_list,root=0)
 
 mat_C = matrix_mult(mats[0],mats[1])
 
-result_list = comm.gather(mat_C,root=0)
+res_list = comm.gather(mat_C,root=0)
 
 if rank == 0:
     res = np.vstack( np.split( np.concatenate(res_list,axis=1) , i_len, axis=1) )
