@@ -12,16 +12,18 @@ for i in range(len(lines)):
 
 times = times[:-1]
 
+print(times)
+
 data=[]
 for time in times:
     temp = time.split(" ")
     temp = temp[:-1]
     new_time = []
     new_time.append(int(temp[0]))
-    new_time.append(int(temp[1])-1)
+    new_time.append(int(temp[1]))
     sum = 0
-    for j in range(2,len(temp)):
-        temp[j] = float(temp[j])
+    #for j in range(2,len(temp)):
+    #    temp[j] = float(temp[j])
     new_time.append(max(temp[2:]))
     data.append(new_time)
 
