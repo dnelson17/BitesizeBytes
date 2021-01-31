@@ -62,9 +62,10 @@ if rank == 0:
     print("i len")
     print(i_len)
     res = np.vstack( np.split( np.concatenate(res_list,axis=1) , i_len, axis=1) )
-    print("res")
+    print("my resullt")
     print(res)
-    print("ans")
+    print("real answer")
     print(ans)
+    print("Are they equal:)
     print(np.array_equal(res, ans))
     
