@@ -34,6 +34,9 @@ if rank == 0:
     mat_A = np.random.rand(mat_size,mat_size)
     mat_B = np.random.rand(mat_size,mat_size)
     ans = np.matmul(mat_A,mat_B)
+    
+    t_start = MPI.Wtime()
+    
     power = np.log2(size)/2
     i_len = int(2**(np.ceil(power)))
     j_len = int(2**(np.floor(power)))
@@ -56,5 +59,7 @@ res_list = comm.gather(mat_C,root=0)
 
 if rank == 0:
     res = np.vstack( np.split( np.concatenate(res_list,axis=1) , i_len, axis=1) )
+    t_diff = MPI.Wtime() - t_start
+    print(t_diff)
     print(np.array_equal(res, ans))
     
