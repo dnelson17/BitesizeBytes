@@ -46,10 +46,11 @@ if rank == 0:
 else:
     mat_A = None
     mat_B = None
+    send_list = None
 
 mats = comm.scatter(send_list,root=0)
 
-mat_C = matrix_mult(mat[0],mats[1])
+mat_C = matrix_mult(mats[0],mats[1])
 
 result_list = comm.gather(mat_C,root=0)
 
