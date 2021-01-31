@@ -7,7 +7,7 @@ import sys
 # GSsPRhcaJ3
 # ssh aigis06
 # cd BitesizeBytes/LearningPythonMPI
-# /usr/bin/mpiexec -n 4 python3 scatter.py 32 32
+# /usr/bin/mpiexec -n 4 python3 scatter.py 4 4
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -66,5 +66,5 @@ if rank == 0:
     print(res)
     print("ans")
     print(ans)
-    print(np.array_equal(res, ans, equal_nan=False))
+    print(np.array_equal(res, ans))
     
