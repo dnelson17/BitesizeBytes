@@ -66,6 +66,6 @@ if rank == 0:
     print(res)
     print("real answer")
     print(ans)
-    print("Are they equal:)
+    print("Are they equal:")
     print(np.array_equal(res, ans))
     
