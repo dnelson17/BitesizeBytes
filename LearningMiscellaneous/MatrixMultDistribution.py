@@ -58,6 +58,99 @@ def tester_3(size, mat_size):
     return send_list, answer
 
 
+#simplified version of tester 3 using numpy for you
+def deconstruct(size,mat_size):
+    #mat_A = np.random.rand(mat_size,mat_size)
+    #mat_B = np.random.rand(mat_size,mat_size)
+    mat_A = np.arange(mat_size**2).reshape([mat_size,mat_size])
+    mat_B = np.arange(mat_size**2,2*mat_size**2).reshape([mat_size,mat_size])
+    answer = np.matmul(mat_A,mat_B)
+    print("mat A")
+    print(mat_A)
+    print("mat B")
+    print(mat_B)
+    print("answer")
+    print(answer)
+    print("")
+    #want to do the splitting here, but use numpy to do it for you
+    power = np.log2(size)/2
+    i_len = int(2**(np.ceil(power)))
+    j_len = int(2**(np.floor(power)))
+    send_list_A = np.split(mat_A, i_len, axis=0)
+    send_list_B = np.split(mat_B, j_len, axis=1)
+    #print(send_list_A)
+    #print(send_list_B)
+    send_list = []
+    #print(len(send_list_A))
+    for i in range(i_len):
+        for j in range(j_len):
+            send_list.append([send_list_A[i],send_list_B[j]])
+
+    return send_list, answer
+    #print(send_list)
+
+
+#simplified version of tester 3 using numpy for you
+def deconstruct_with_np_repeat(size,mat_size):
+    #mat_A = np.random.rand(mat_size,mat_size)
+    #mat_B = np.random.rand(mat_size,mat_size)
+    mat_A = np.arange(mat_size**2).reshape([mat_size,mat_size])
+    mat_B = np.arange(mat_size**2,2*mat_size**2).reshape([mat_size,mat_size])
+    answer = np.matmul(mat_A,mat_B)
+    print(mat_A)
+    print(mat_B)
+    #print(answer)
+    print("")
+    #want to do the splitting here, but use numpy to do it for you
+    power = np.log2(size)/2
+    i_len = int(2**(np.ceil(power)))
+    j_len = int(2**(np.floor(power)))
+    print("\n\n")
+    print(np.split(mat_A, i_len, axis=0))
+    print(np.split(mat_B, j_len, axis=1))
+    print("")
+    #print( np.concatenate( (np.split(mat_A, i_len, axis=0)) , axis=1) )
+    #print("\n\n")
+    send_list_A = np.tile( np.split(mat_A, i_len, axis=0), i_len)
+    send_list_B = np.tile( np.split(mat_B, j_len, axis=1), j_len)
+    #send_list_A = np.split( np.tile( np.split(mat_A, i_len, axis=0), i_len), i_len, axis=0)
+    print(send_list_A)
+    print(send_list_B)
+    send_list_B = np.split(mat_B, j_len, axis=1)
+    #send_list_A = np.repeat()
+    
+
+def reconstruct(size,mat_size,res_list):
+    print("\n\n\n\n")
+    power = np.log2(size)/2
+    i_len = int(2**(np.ceil(power)))
+    print(i_len)
+    j_len = int(2**(np.floor(power)))
+    print(j_len)
+    
+    res = np.zeros((size,size))
+
+    print(res_list)
+    x = np.concatenate(res_list,axis=1)
+    print("x")
+    print(x)
+    y = np.split( x, i_len, axis=1)
+    print("y")
+    print(y)
+    z = np.vstack( y )
+    print("mine original (z)")
+    print(z)
+    #print("mine transpose (z^t)")
+    #print(np.transpose(z))
+
+    all_in_one = np.vstack( np.split( np.concatenate(res_list,axis=1) , i_len, axis=1) )
+    print("all in one")
+    print(all_in_one)
+    return all_in_one
+
+    
+
+"""
 #tester_2(4,8)
 print("\n\n")
 print("hello")
@@ -140,4 +233,26 @@ print(res_list)
 print(answer)
 
 
+print("\n\n\n\n\n\n\n")
+"""
+
+send_list, ans = deconstruct(8,8)
+
+res_list = []
+for mat in send_list:
+    #res_list.append(np.matmul(mat[0],mat[1]))
+    res_list.append(matrix_mult(mat[0],mat[1]))
+
+print("res list")
+print(res_list)
+
+res = reconstruct(8,8,res_list)
+
+print(np.array_equal(res, ans, equal_nan=False))
+
+#mat_A = np.arange(8**2).reshape([8,8])
+#mat_B = np.arange(8**2,2*8**2).reshape([8,8])
+
+#print("real result")
+#print(np.matmul(mat_A,mat_B))
 

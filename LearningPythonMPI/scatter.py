@@ -7,11 +7,11 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-def matrix_mult(first_row, last_row, mat_A, mat_B):
-    mat_C = np.zeros(mat_B.shape)
-    for i in range(first_row, last_row):
-        for j in range(mat_size):
-            for k in range(mat_size):
+def matrix_mult(mat_A, mat_B):
+    mat_C = np.zeros((mat_A.shape[0],mat_B.shape[1]))
+    for i in range(len(mat_A)):
+        for j in range(len(mat_B[i])):
+            for k in range(len(mat_B)):
                 mat_C[i,j] += mat_A[i][k] * mat_B[k][j]
     return mat_C
 
@@ -27,40 +27,27 @@ mat_size = numberRows
 if rank == 0:
     mat_A = np.random.rand(mat_size,mat_size)
     mat_B = np.random.rand(mat_size,mat_size)
-    #need to split the matrices here s.t. they can be scattered
-    for i in range(size):
-        first_i = round(i * mat_size / size)
-        last_i = round((i + 1) * mat_size / size)
-        for j in range(size):
-            first_j = round(j * mat_size / size)
-            last_j = round((j + 1) * mat_size / size)
+    ans = np.matmul(mat_A,mat_B)
+    power = np.log2(size)/2
+    i_len = int(2**(np.ceil(power)))
+    j_len = int(2**(np.floor(power)))
+    send_list_A = np.split(mat_A, i_len, axis=0)
+    send_list_B = np.split(mat_B, j_len, axis=1)
+    send_list = []
+    for i in range(i_len):
+        for j in range(j_len):
+            send_list.append([send_list_A[i],send_list_B[j]])
 else:
     mat_A = None
     mat_B = None
 
-mat_A = comm.scatter(mat_A,root=0)
-mat_B = comm.scatter(mat_B,root=0)
+mats = comm.scatter(send_list,root=0)
 
-mat_C = matrix_mult(mat_A,mat_B)
+mat_C = matrix_mult(mat[0],mats[1])
 
-final_mat_C = comm.gather(mat_C,root=0)
+result_list = comm.gather(mat_C,root=0)
 
-
-
-# Scatter matrices to all processes
-print("Process ", rank, " before n = ", n[0])
-comm.Bcast(n, root=0)
-print("Process ", rank, " after n = ", n[0])
-
-# Compute partition
-h = (b - a) / (n * size) # calculate h *after* we receive n
-a_i = a + rank * h * n
-my_int[0] = integral(a_i, h, n[0])
-
-# Send partition back to root process, computing sum across all partitions
-print("Process ", rank, " has the partial integral ", my_int[0])
-comm.Reduce(my_int, integral_sum, MPI.SUM, dest)
-
-# Only print the result in process 0
 if rank == 0:
-    print('The Integral Sum =', integral_sum[0])
+    res = np.vstack( np.split( np.concatenate(res_list,axis=1) , i_len, axis=1) )
+    print(np.array_equal(res, ans, equal_nan=False))
+    
