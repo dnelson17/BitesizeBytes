@@ -34,8 +34,12 @@ if rank == 0:
     mat_A = np.random.rand(mat_size,mat_size)
     mat_B = np.random.rand(mat_size,mat_size)
     ans = np.matmul(mat_A,mat_B)
+    print("ans")
+    print(ans)
     power = np.log2(size)/2
     i_len = int(2**(np.ceil(power)))
+    print("i len")
+    print(i_len)
     j_len = int(2**(np.floor(power)))
     send_list_A = np.split(mat_A, i_len, axis=0)
     send_list_B = np.split(mat_B, j_len, axis=1)
@@ -55,6 +59,12 @@ mat_C = matrix_mult(mats[0],mats[1])
 res_list = comm.gather(mat_C,root=0)
 
 if rank == 0:
+    print("i len")
+    print(i_len)
     res = np.vstack( np.split( np.concatenate(res_list,axis=1) , i_len, axis=1) )
+    print("res")
+    print(res)
+    print("ans")
+    print(ans)
     print(np.array_equal(res, ans, equal_nan=False))
     
