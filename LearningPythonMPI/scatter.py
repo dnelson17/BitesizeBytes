@@ -1,7 +1,9 @@
 from mpi4py import MPI
 import time
 import numpy as np
-import sys 
+import sys
+
+# /usr/bin/mpiexec -n 4 python3 scatter.py 32 32
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
