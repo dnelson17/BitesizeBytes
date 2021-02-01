@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 
-with open('scatter_results.txt') as f:
+with open('results.txt') as f:
     lines = [line.rstrip() for line in f]
 
 times = ['']
