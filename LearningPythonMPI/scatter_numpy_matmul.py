@@ -4,7 +4,7 @@ import numpy as np
 import sys
 
 # ssh -XY 40199787@aigis.mp.qub.ac.uk
-# GSsPRhcaJ3
+# 
 # ssh aigis06
 # cd BitesizeBytes/LearningPythonMPI
 # /usr/bin/mpiexec -n 4 python3 scatter.py 4 4
