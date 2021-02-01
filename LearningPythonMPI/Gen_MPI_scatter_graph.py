@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 
 #Open file
-with open('scatter_results.txt') as f:
+with open('scatter_results_my_func.txt') as f:
     lines = [line.rstrip() for line in f]
 
 #Read in each line
