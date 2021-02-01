@@ -61,5 +61,5 @@ if rank == 0:
     res = np.vstack( np.split( np.concatenate(res_list,axis=1) , i_len, axis=1) )
     t_diff = MPI.Wtime() - t_start
     print(t_diff)
-    print(np.array_equal(res, ans))
+    #print(np.array_equal(res, ans))
     
