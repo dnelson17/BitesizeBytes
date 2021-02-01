@@ -17,14 +17,14 @@ print(times)
 data=[]
 for time in times:
     temp = time.split(" ")
-    temp = temp[:-2]
+    temp = temp[:-1]
     new_time = []
     new_time.append(int(temp[0]))
     new_time.append(int(temp[1]))
     sum = 0
     for j in range(2,len(temp)):
         temp[j] = float(temp[j])
-    new_time.append(max(temp[2:]))
+    new_time.append(sum(temp[2:])/len(temp[2:]))
     data.append(new_time)
 
 final_times = [[]]
