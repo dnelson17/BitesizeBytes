@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for mat_size in 8 16 32 64 128 256 512 1024 2048; do
+for mat_size in 8 16 32 64 128 256 512 1024 2048 4096 8192 16384; do
 	for p in 1 2 4 8; do
 			echo "$mat_size" >> scatter_results.txt
 			echo "$p" >> scatter_results.txt
