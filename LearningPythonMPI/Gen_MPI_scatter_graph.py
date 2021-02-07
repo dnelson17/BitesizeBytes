@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 
 #Open file
-with open('scatter_lapack_2.txt') as f:
+with open('scatter_results_lapack_2.txt') as f:
     lines = [line.rstrip() for line in f]
 
 #Read in each line
