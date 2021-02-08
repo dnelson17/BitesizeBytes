@@ -18,7 +18,7 @@ def matrix_mult(mat_A, mat_B):
     for i in range(len(mat_A)):
         for j in range(len(mat_B[i])):
             for k in range(len(mat_B)):
-                mat_C[i,j] += mat_A[i][k] * mat_B[k][j]
+                mat_C[i,j] += mat_A[i][k] * mat_B[j][k]
     return mat_C
 
 
@@ -29,6 +29,13 @@ assert numberRows == numberColumns
 
 mat_size = numberRows
 
+power = np.log2(size)/2
+#represents the number of partitons that must be calculated in the result matrix C
+i_len = int(2**(np.ceil(power)))
+j_len = int(2**(np.floor(power)))
+i_size = mat_size/i_len
+j_size = mat_size/j_len
+
 # Initialize the 2 random matrices only if this is rank 0
 if rank == 0:
     mat_A = np.random.rand(mat_size,mat_size)
@@ -38,27 +45,23 @@ if rank == 0:
     t_start = MPI.Wtime()
 
     send_list = []
-    power = np.log2(size)/2
-    i_len = int(2**(np.ceil(power)))
-    j_len = int(2**(np.floor(power)))
     for i in range(i_len):
         for j in range(j_len):
-            send_list.append([[i*(mat_size/i_len),(i+1)*(mat_size/i_len)-1],[j*(mat_size/j_len),(j+1)*(mat_size/j_len)-1]])
+            send_list.append([i*i_size,j*j_size])
 else:
     send_list = None
 
 info = comm.scatter(send_list,root=0)
 
-f_A = MPI.File.Open(comm,"mat_A.txt", amode=MPI.MODE_RDONLY)
-mat_A = np.empty((mat_size,info[0][0]-info[0][1]+1), dtype=np.byte)
-f_B = MPI.File.Open(comm,"mat_B.txt", amode=MPI.MODE_RDONLY)
-mat_B = np.empty((info[1][0]-info[1][1]+1,mat_size), dtype=np.byte)
+mat_A = np.loadtxt("mat_A.txt",skiprows=info[0],max_rows=i_size)
+mat_B = np.loadtxt("mat_B.txt",skiprows=info[1],max_rows=j_size)
 mat_C = matrix_mult(mat_A,mat_B)
 
 res_list = comm.gather(mat_C,root=0)
 
 if rank == 0:
     res = np.vstack( np.split( np.concatenate(res_list,axis=1) , i_len, axis=1) )
+    np.savetxt("mat_C.txt")
     t_diff = MPI.Wtime() - t_start
     print(t_diff)
     #print(np.array_equal(res, ans))
