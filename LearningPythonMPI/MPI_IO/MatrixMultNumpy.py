@@ -48,8 +48,11 @@ if rank == 0:
     for i in range(i_len):
         for j in range(j_len):
             send_list.append([i*i_size,j*j_size])
+    print(send_list)
 else:
     send_list = None
+
+comm.barrier()
 
 info = comm.scatter(send_list,root=0)
 
