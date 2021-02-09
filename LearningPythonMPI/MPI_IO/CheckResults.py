@@ -14,6 +14,7 @@ def matrix_mult(mat_A, mat_B):
 
 mat_A = np.loadtxt("mat_A.txt")
 mat_B = np.loadtxt("mat_B.txt")
+mat_B = np.transpose(mat_B)
 
 #answer = np.matmul(mat_A,mat_B)
 #answer = matrix_mult(mat_A,mat_B)
