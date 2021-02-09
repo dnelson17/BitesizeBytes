@@ -21,10 +21,13 @@ mat_B = np.transpose(mat_B)
 answer = FB.sgemm(alpha=1.0, a=mat_A, b=mat_B)
 
 
+print("Real answer")
 print(answer)
 
 res = np.loadtxt("mat_C.txt")
 
+print("My Result")
 print(res)
 
 print(np.array_equal(answer,res))
+print(np.allclose(answer,res))

@@ -39,15 +39,10 @@ comm.barrier()
 
 info = comm.scatter(send_list,root=0)
 
-print(f"rank: {rank}, info[0]: {info[0]}, i_size: {i_size}, info[1]: {info[1]}, j_size: {j_size}")
 mat_A = np.loadtxt("mat_A.txt",skiprows=info[0],max_rows=i_size)
 mat_B = np.loadtxt("mat_B.txt",skiprows=info[1],max_rows=j_size)
-print(f"rank: {rank}, mat_A = \n{mat_A}")
-print(f"rank: {rank}, mat_B (pre-transpose) = \n{mat_B}")
 mat_B = np.transpose(mat_B)
-print(f"rank: {rank}, mat_B (post-transpose) = \n{mat_B}")
 mat_C = FB.sgemm(alpha=1.0, a=mat_A, b=mat_B)
-print(f"rank: {rank}, mat c: {mat_C}")
 
 res_list = comm.gather(mat_C,root=0)
 
