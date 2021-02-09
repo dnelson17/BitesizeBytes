@@ -8,7 +8,7 @@ from scipy.linalg import blas as FB
 # 
 # ssh aigis06
 # cd BitesizeBytes/LearningPythonMPI/MPI_IO
-# /usr/bin/mpiexec -n 4 python3 MatrixMultSGEMM.py 8 8
+# /usr/bin/mpiexec -n 4 python3 MatrixMultSGEMM.py 8
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
