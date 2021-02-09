@@ -14,16 +14,6 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-def matrix_mult(mat_A, mat_B):
-    mat_C = np.zeros((mat_A.shape[0],mat_B.shape[0]))
-    print(mat_C.shape)
-    for i in range(len(mat_A)):
-        for j in range(len(mat_B)):
-            for k in range(len(mat_B[i])):
-                mat_C[i,j] += mat_A[i][k] * mat_B[j][k]
-    return mat_C
-
-
 numberRows = int( sys.argv[1])
 numberColumns = int( sys.argv[2])
 
@@ -41,12 +31,10 @@ j_size = int(mat_size/j_len)
 # Initialize the 2 random matrices only if this is rank 0
 if rank == 0:
     t_start = MPI.Wtime()
-
     send_list = []
     for i in range(i_len):
         for j in range(j_len):
             send_list.append([int(i*i_size),int(j*j_size)])
-    print(send_list)
 else:
     send_list = None
 
@@ -66,5 +54,4 @@ if rank == 0:
     np.savetxt("mat_C.txt",res)
     t_diff = MPI.Wtime() - t_start
     print(t_diff)
-    #print(np.array_equal(res, ans))
     
