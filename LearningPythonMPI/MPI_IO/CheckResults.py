@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.linalg import blas as FB
 
 def matrix_mult(mat_A, mat_B):
     mat_C = np.zeros((mat_A.shape[0],mat_B.shape[0]))
@@ -14,7 +15,9 @@ mat_A = np.loadtxt("mat_A.txt")
 mat_B = np.loadtxt("mat_B.txt")
 
 #answer = np.matmul(mat_A,mat_B)
-answer = matrix_mult(mat_A,mat_B)
+#answer = matrix_mult(mat_A,mat_B)
+answer = FB.sgemm(alpha=1.0, a=mat_A, b=mat_B)
+
 
 print(answer)
 
