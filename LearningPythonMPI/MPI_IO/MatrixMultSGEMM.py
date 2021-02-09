@@ -8,7 +8,7 @@ from scipy.linalg import blas as FB
 # 
 # ssh aigis06
 # cd BitesizeBytes/LearningPythonMPI/MPI_IO
-# /usr/bin/mpiexec -n 4 python3 MatrixMultNumpy.py 8 8
+# /usr/bin/mpiexec -n 4 python3 MatrixMultSGEMM.py 8 8
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -45,7 +45,7 @@ info = comm.scatter(send_list,root=0)
 mat_A = np.loadtxt("mat_A.txt",skiprows=info[0],max_rows=i_size)
 mat_B = np.loadtxt("mat_B.txt",skiprows=info[1],max_rows=j_size)
 mat_B = np.transpose(mat_B)
-mat_C = matrix_mult(mat_A,mat_B)
+mat_C = FB.sgemm(alpha=1.0, a=mat_A, b=mat_B)
 
 res_list = comm.gather(mat_C,root=0)
 
