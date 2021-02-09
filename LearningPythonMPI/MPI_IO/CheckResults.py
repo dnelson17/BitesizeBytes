@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.linalg import blas as FB
+import sys
 
 def matrix_mult(mat_A, mat_B):
     mat_C = np.zeros((mat_A.shape[0],mat_B.shape[0]))

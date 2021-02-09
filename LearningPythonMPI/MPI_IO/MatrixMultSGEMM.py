@@ -14,13 +14,10 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-numberRows = int( sys.argv[1])
-numberColumns = int( sys.argv[2])
+#Reads the Matrix Size from the command line
+mat_size = int(sys.argv[1])
 
-assert numberRows == numberColumns
-
-mat_size = numberRows
-
+#Assuming the matrix is of size 2^n for int N, we take log2 to find the value of n
 power = np.log2(size)/2
 #represents the number of partitons that must be calculated in the result matrix C
 i_len = int(2**(np.ceil(power)))
@@ -46,6 +43,7 @@ mat_A = np.loadtxt("mat_A.txt",skiprows=info[0],max_rows=i_size)
 mat_B = np.loadtxt("mat_B.txt",skiprows=info[1],max_rows=j_size)
 mat_B = np.transpose(mat_B)
 mat_C = FB.sgemm(alpha=1.0, a=mat_A, b=mat_B)
+print(f"rank: {rank}, mat c: {mat_C}")
 
 res_list = comm.gather(mat_C,root=0)
 
