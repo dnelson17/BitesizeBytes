@@ -57,9 +57,7 @@ comm.barrier()
 info = comm.scatter(send_list,root=0)
 
 mat_A = np.loadtxt("mat_A.txt",skiprows=info[0],max_rows=i_size)
-print(mat_A)
 mat_B = np.loadtxt("mat_B.txt",skiprows=info[1],max_rows=j_size)
-print(mat_B)
 mat_C = matrix_mult(mat_A,mat_B)
 
 res_list = comm.gather(mat_C,root=0)
