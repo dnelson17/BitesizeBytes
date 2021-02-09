@@ -46,7 +46,7 @@ print(mat)
 
 print("\n\n")
 
-mat_A = np.loadtxt("mat_A.txt",skiprows=0,max_rows=4)
+mat_A = np.loadtxt("mat_A.txt",skiprows=4,max_rows=4)
 print(mat_A)
 
   
