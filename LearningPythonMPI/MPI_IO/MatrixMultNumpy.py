@@ -34,8 +34,8 @@ power = np.log2(size)/2
 #represents the number of partitons that must be calculated in the result matrix C
 i_len = int(2**(np.ceil(power)))
 j_len = int(2**(np.floor(power)))
-i_size = mat_size/i_len
-j_size = mat_size/j_len
+i_size = int(mat_size/i_len)
+j_size = int(mat_size/j_len)
 
 # Initialize the 2 random matrices only if this is rank 0
 if rank == 0:
