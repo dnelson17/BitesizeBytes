@@ -7,7 +7,7 @@ import sys
 # 
 # ssh aigis06
 # cd BitesizeBytes/LearningPythonMPI/MPI_IO
-# /usr/bin/mpiexec -n 4 python3 MatrixMult.py 4 4
+# /usr/bin/mpiexec -n 4 python3 MatrixMultNumpy.py 8 8
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -47,7 +47,7 @@ if rank == 0:
     send_list = []
     for i in range(i_len):
         for j in range(j_len):
-            send_list.append([i*i_size,j*j_size])
+            send_list.append([int(i*i_size),int(j*j_size)])
     print(send_list)
 else:
     send_list = None
