@@ -39,6 +39,9 @@ comm.barrier()
 
 info = comm.scatter(send_list,root=0)
 
+print(f"rank: {rank}, info[0]: {info[0]}, i_size: {i_size}, info[1]: {info[1]}, j_size: {j_size}")
+print(f"rank: {rank}, mat_A = \n{mat_A}")
+print(f"rank: {rank}, mat_B = \n{mat_B}")
 mat_A = np.loadtxt("mat_A.txt",skiprows=info[0],max_rows=i_size)
 mat_B = np.loadtxt("mat_B.txt",skiprows=info[1],max_rows=j_size)
 mat_B = np.transpose(mat_B)
