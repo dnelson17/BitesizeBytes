@@ -14,7 +14,7 @@ rank = comm.Get_rank()
 size = comm.Get_size()
 
 def matrix_mult(mat_A, mat_B):
-    mat_C = np.zeros((mat_A.shape[0],mat_B.shape[1]))
+    mat_C = np.zeros((mat_A.shape[0],mat_B.shape[0]))
     for i in range(len(mat_A)):
         for j in range(len(mat_B[i])):
             for k in range(len(mat_B)):
