@@ -68,7 +68,7 @@ res_list = comm.gather(mat_C,root=0)
 
 if rank == 0:
     res = np.vstack( np.split( np.concatenate(res_list,axis=1) , i_len, axis=1) )
-    np.savetxt("mat_C.txt")
+    np.savetxt("mat_C.txt",res)
     t_diff = MPI.Wtime() - t_start
     print(t_diff)
     #print(np.array_equal(res, ans))
