@@ -63,6 +63,7 @@ print(f"rank: {rank}, info[0]: {info[0]}, i_size: {i_size}, info[1]: {info[1]}, 
 mat_A = np.loadtxt("mat_A.txt",skiprows=4,max_rows=4)
 mat_B = np.loadtxt("mat_B.txt",skiprows=4,max_rows=4)
 mat_C = matrix_mult(mat_A,mat_B)
+print(f"rank: {rank}, mat_C: {mat_C}")
 
 res_list = comm.gather(mat_C,root=0)
 
