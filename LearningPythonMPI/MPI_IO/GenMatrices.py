@@ -11,5 +11,5 @@ mat_A = np.random.rand(mat_size,mat_size)
 mat_B = np.random.rand(mat_size,mat_size)
 mat_B = np.transpose(mat_B)
 
-np.savetxt(f"mat_A_{mat_size}_{size}_{iteration}.txt", mat_A)
-np.savetxt(f"mat_B_{mat_size}_{size}_{iteration}.txt", mat_B)
+np.savetxt(f"mat_A/mat_A_{mat_size}_{size}_{iteration}.txt", mat_A)
+np.savetxt(f"mat_B/mat_B_{mat_size}_{size}_{iteration}.txt", mat_B)
