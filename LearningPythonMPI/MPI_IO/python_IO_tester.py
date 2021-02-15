@@ -1,5 +1,7 @@
 import numpy as np
 
+"""
+
 def dist(size,mat_size):
     power = np.log2(size)/2
     i_len = int(2**(np.ceil(power)))
@@ -66,3 +68,21 @@ print(send_list)
 
 
 f.close() 
+
+
+"""
+
+mat_x = np.random.rand(4,4)
+mat_y = mat_x.astype(np.float32)
+
+print(mat_x.dtype)
+print(mat_y.dtype)
+
+print(mat_x.nbytes/16)
+print(mat_y.nbytes/16)
+
+print(mat_x)
+print(mat_y)
+
+np.savetxt("mat_x",mat_x)
+np.savetxt("mat_y",mat_y)

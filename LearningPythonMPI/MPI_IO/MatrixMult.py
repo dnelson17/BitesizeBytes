@@ -13,37 +13,25 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-def matrix_mult(mat_A, mat_B):
-    mat_C = np.zeros((mat_A.shape[0],mat_B.shape[1]))
-    for i in range(len(mat_A)):
-        for j in range(len(mat_B[i])):
-            for k in range(len(mat_B)):
-                mat_C[i,j] += mat_A[i][k] * mat_B[k][j]
-    return mat_C
+#Reads the Matrix Size from the command line
+mat_size = int(sys.argv[1])
+iteration = int(sys.argv[2])
 
-
-numberRows = int( sys.argv[1])
-numberColumns = int( sys.argv[2])
-
-assert numberRows == numberColumns
-
-mat_size = numberRows
+#Assuming the matrix is of size 2^n for int N, we take log2 to find the value of n
+power = np.log2(size)/2
+#represents the number of partitons that must be calculated in the result matrix C
+i_len = int(2**(np.ceil(power)))
+j_len = int(2**(np.floor(power)))
+i_size = int(mat_size/i_len)
+j_size = int(mat_size/j_len)
 
 # Initialize the 2 random matrices only if this is rank 0
 if rank == 0:
-    mat_A = np.random.rand(mat_size,mat_size)
-    mat_B = np.random.rand(mat_size,mat_size)
-    ans = np.matmul(mat_A,mat_B)
-    
     t_start = MPI.Wtime()
-
     send_list = []
-    power = np.log2(size)/2
-    i_len = int(2**(np.ceil(power)))
-    j_len = int(2**(np.floor(power)))
     for i in range(i_len):
         for j in range(j_len):
-            send_list.append([[i*(mat_size/i_len),(i+1)*(mat_size/i_len)-1],[j*(mat_size/j_len),(j+1)*(mat_size/j_len)-1]])
+            send_list.append([int(i*i_size),int(j*j_size)])
 else:
     send_list = None
 
