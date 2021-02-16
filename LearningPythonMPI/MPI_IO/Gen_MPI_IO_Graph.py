@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 
-with open('mpi_io_results.txt') as f:
+with open('mpi_io_results_0902.txt') as f:
     lines = [line.rstrip() for line in f]
 
 times = ['']
