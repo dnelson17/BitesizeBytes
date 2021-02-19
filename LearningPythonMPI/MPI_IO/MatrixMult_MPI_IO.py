@@ -52,6 +52,7 @@ buf_mat_C = FB.sgemm(alpha=1.0, a=buf_mat_A, b=buf_mat_B)
 
 fh_C = MPI.File.Open(comm, f"mat_C/mat_C_{mat_size}_{iteration}.txt", amode_C)
 
+#need to add code to write results to mat_C file
 offset_C = 
 
 fh_C.Write_at_all(offset_C, buf_mat_C)
