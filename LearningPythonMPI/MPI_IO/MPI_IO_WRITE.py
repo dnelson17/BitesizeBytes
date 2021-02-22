@@ -28,14 +28,14 @@ i_coord = factor * rank // i_len
 j_coord = rank % j_len
 
 buffer = np.empty((i_size,j_size), dtype='i')
-buffer[:] = rank
+buffer[:] = float(rank)
 
-filetype = MPI.INT.Create_vector(j_size, i_size, mat_size)
+filetype = MPI.FLOAT.Create_vector(j_size, i_size, mat_size)
 filetype.Commit()
 
 print(f"rank: {rank}, i_coord {i_coord}, j_coord: {j_coord}, i_size: {i_size}, j_size: {j_size}, disp: {mat_size*i_coord*i_size + j_coord*j_size}")
 
-displacement = MPI.INT.Get_size()*(mat_size*i_coord*i_size + j_coord*j_size)
+displacement = MPI.FLOAT.Get_size()*(mat_size*i_coord*i_size + j_coord*j_size)
 fh.Set_view(displacement, filetype=filetype)
 
 fh.Write_all(buffer)

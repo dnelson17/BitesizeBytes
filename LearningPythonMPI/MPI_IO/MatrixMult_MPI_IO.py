@@ -36,32 +36,31 @@ factor = 2**(int(np.log2(size))%2)
 i_coord = factor * rank // pars_i
 j_coord = rank % pars_j
 
-buf_mat_A = np.empty((i_size,mat_size), dtype=np.float32)
-buf_mat_B = np.empty((j_size,mat_size), dtype=np.float32)
-
-offset_A = i_coord*buf_mat_A.nbytes
-offset_B = j_coord*buf_mat_B.nbytes
-
 t_start = MPI.Wtime()
 
 fh_A = MPI.File.Open(comm, f"mat_A/mat_A_{mat_size}_{iteration}.txt", amode_A)
-fh_B = MPI.File.Open(comm, f"mat_B/mat_B_{mat_size}_{iteration}.txt", amode_B)
-    
+buf_mat_A = np.empty((i_size,mat_size), dtype=np.float32)
+offset_A = i_coord*buf_mat_A.nbytes
 fh_A.Read_at_all(offset_A, buf_mat_A)
-fh_B.Read_at_all(offset_B, buf_mat_B)
+fh_A.Close()
 
-buf_mat_C = FB.sgemm(alpha=1.0, a=buf_mat_A, b=buf_mat_B)
+fh_B = MPI.File.Open(comm, f"mat_B/mat_B_{mat_size}_{iteration}.txt", amode_B)
+buf_mat_B = np.empty((j_size,mat_size), dtype=np.float32)
+offset_B = j_coord*buf_mat_B.nbytes
+fh_B.Read_at_all(offset_B, buf_mat_B)
+mat_B = np.transpose(buf_mat_B)
+fh_B.Close()
+
+buf_mat_C = FB.sgemm(alpha=1.0, a=buf_mat_A, b=mat_B)
 
 fh_C = MPI.File.Open(comm, f"mat_C/mat_C_{mat_size}_{iteration}.txt", amode_C)
-
-#need to add code to write results to mat_C file
-offset_C = 
-
-fh_C.Write_at_all(offset_C, buf_mat_C)
+filetype = MPI.FLOAT.Create_vector(j_size, i_size, mat_size)
+filetype.Commit()
+offset_C = MPI.FLOAT.Get_size()*(mat_size*i_coord*i_size + j_coord*j_size)
+fh.Set_view(displacement, filetype=filetype)
+fh.Write_all(buffer)
+filetype.Free()
+fh_C.Close()
 
 t_diff = MPI.Wtime() - t_start
 print(f"rank: {rank}, time: {t_diff}")
-
-fh_A.Close()
-fh_B.Close()
-fh_C.Close()
