@@ -35,12 +35,13 @@ j_coord = rank % pars_j
 
 t_start = MPI.Wtime()
 
+#Opening and reading matrix A
 fh_A = MPI.File.Open(comm, f"mat_A/mat_A_{mat_size}_{iteration}.txt", amode_A)
 buf_mat_A = np.empty((i_size,mat_size), dtype=np.float32)
 offset_A = i_coord*buf_mat_A.nbytes
 fh_A.Read_at_all(offset_A, buf_mat_A)
 fh_A.Close()
-
+#Opening and reading matrix B
 fh_B = MPI.File.Open(comm, f"mat_B/mat_B_{mat_size}_{iteration}.txt", amode_B)
 buf_mat_B = np.empty((j_size,mat_size), dtype=np.float32)
 offset_B = j_coord*buf_mat_B.nbytes
@@ -53,7 +54,6 @@ calc_start = MPI.Wtime()
 buf_mat_C = FB.sgemm(alpha=1.0, a=buf_mat_A, b=mat_B)
 
 calc_time = MPI.Wtime() - calc_start
-print(calc_time)
 
 fh_C = MPI.File.Open(comm, f"mat_C/mat_C_{mat_size}_{iteration}.txt", amode_C)
 filetype = MPI.FLOAT.Create_vector(j_size, i_size, mat_size)
@@ -67,4 +67,10 @@ fh_C.Close()
 total_time = MPI.Wtime() - t_start
 
 comm.Barrier()
-print(total_time)
+
+calc_sum = comm.gather(calc_time, op=MPI.SUM, root=0)
+total_sum = comm.gather(total_time, op=MPI.SUM, root=0)
+
+if rank == 0:
+    print(calc_sum/size)
+    print(total_sum/size)
