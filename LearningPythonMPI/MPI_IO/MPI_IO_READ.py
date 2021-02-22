@@ -20,4 +20,4 @@ fh.Read_all(buffer)
 fh.Close()
 
 print(buffer)
-print(np.transpose(buffer))
+#print(np.transpose(buffer))
