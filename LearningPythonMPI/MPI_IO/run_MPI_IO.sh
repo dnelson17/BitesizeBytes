@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for mat_size in 64 128 256 512 1024 2048 4096 8192 16384 32768:; do
+for mat_size in 128 256 512 1024 2048 4096 8192 16384 32768; do
 	echo "$mat_size" >> mpi_io_results.txt
 	echo "" >> mpi_io_results.txt
 	echo "$mat_size"
