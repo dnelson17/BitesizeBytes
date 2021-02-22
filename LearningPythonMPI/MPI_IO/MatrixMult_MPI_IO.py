@@ -24,15 +24,17 @@ iteration = int(sys.argv[2])
 
 #Assuming the matrix is of size 2^n for int N, we take log2 to find the value of n
 power = np.log2(size)/2
-#represents the number of partitons that must be calculated in the result matrix C
-i_len = int(2**(np.ceil(power)))
-j_len = int(2**(np.floor(power)))
-#Represents the size of each partiton in the i and j axis
-i_size = int(mat_size/i_len)
-j_size = int(mat_size/j_len)
+#the number of partitons that must be calculated in the result matrix C in the i and j dimensions
+pars_i = int(2**(np.ceil(power)))
+pars_j = int(2**(np.floor(power)))
+#the size of each partiton in the i and j axis
+i_size = int(mat_size/pars_i)
+j_size = int(mat_size/pars_j)
+#Adjusts partition sizez for odd values of n
+factor = 2**(int(np.log2(size))%2)
 
-i_coord = rank // 2
-j_coord = rank % 2
+i_coord = factor * rank // pars_i
+j_coord = rank % pars_j
 
 buf_mat_A = np.empty((i_size,mat_size), dtype=np.float32)
 buf_mat_B = np.empty((j_size,mat_size), dtype=np.float32)
