@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+import numpy as np
 
 with open('mpi_io_results.txt') as f:
     lines = [line.rstrip() for line in f]
@@ -13,15 +14,17 @@ for i in range(len(lines)):
 times = times[:-1]
 
 #print(times)
-"""
+max_cores = 8
+n = np.log2(max_cores)+1
+
 data=[]
 for time in times:
     temp = time.split(" ")
     temp = temp[:-1]
+    print(temp)
     new_time = []
     new_time.append(int(temp[0]))
     new_time.append(int(temp[1])-1)
-    sum = 0
     for j in range(2,len(temp)):
         temp[j] = float(temp[j])
     new_time.append(max(temp[2:]))
@@ -41,8 +44,8 @@ for i in range(0,len(data)):
 #print(final_times)
 
 speedup_mat = []
-"""
 
+"""
 #------------
 final_times_1 = []
 final_times_2 = []
@@ -83,3 +86,4 @@ plt.xlabel("Number of cores")
 plt.ylabel("Runtime speed-up")
 plt.legend()
 plt.show()
+"""
