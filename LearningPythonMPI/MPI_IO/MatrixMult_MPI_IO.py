@@ -4,11 +4,8 @@ import numpy as np
 import sys
 from scipy.linalg import blas as FB
 
-# ssh -XY 40199787@aigis.mp.qub.ac.uk
-# 
-# ssh aigis06
 # cd BitesizeBytes/LearningPythonMPI/MPI_IO
-# /usr/bin/mpiexec -n 4 python3 MatrixMult.py 4 4
+# /usr/bin/mpiexec -n 4 python3 MatrixMult_MPI_IO.py 4 4
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -30,9 +27,9 @@ pars_j = int(2**(np.floor(power)))
 #the size of each partiton in the i and j axis
 i_size = int(mat_size/pars_i)
 j_size = int(mat_size/pars_j)
-#Adjusts partition sizez for odd values of n
+#Adjusts partition sizes for odd values of n
 factor = 2**(int(np.log2(size))%2)
-
+#Calculates to coordinates of the result block matrix in mat C
 i_coord = factor * rank // pars_i
 j_coord = rank % pars_j
 
@@ -51,16 +48,22 @@ fh_B.Read_at_all(offset_B, buf_mat_B)
 mat_B = np.transpose(buf_mat_B)
 fh_B.Close()
 
+calc_start = MPI.Wtime()
+
 buf_mat_C = FB.sgemm(alpha=1.0, a=buf_mat_A, b=mat_B)
+
+calc_time = MPI.Wtime() - calc_start
 
 fh_C = MPI.File.Open(comm, f"mat_C/mat_C_{mat_size}_{iteration}.txt", amode_C)
 filetype = MPI.FLOAT.Create_vector(j_size, i_size, mat_size)
 filetype.Commit()
-offset_C = MPI.FLOAT.Get_size()*(mat_size*i_coord*i_size + j_coord*j_size)
+offset_C = (mat_size*i_coord*i_size + j_coord*j_size)*MPI.FLOAT.Get_size()
 fh.Set_view(displacement, filetype=filetype)
 fh.Write_all(buffer)
 filetype.Free()
 fh_C.Close()
 
 t_diff = MPI.Wtime() - t_start
-print(f"rank: {rank}, time: {t_diff}")
+
+comm.Barrier()
+print(t_diff)
