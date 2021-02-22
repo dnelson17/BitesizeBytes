@@ -53,17 +53,18 @@ calc_start = MPI.Wtime()
 buf_mat_C = FB.sgemm(alpha=1.0, a=buf_mat_A, b=mat_B)
 
 calc_time = MPI.Wtime() - calc_start
+print(calc_time)
 
 fh_C = MPI.File.Open(comm, f"mat_C/mat_C_{mat_size}_{iteration}.txt", amode_C)
 filetype = MPI.FLOAT.Create_vector(j_size, i_size, mat_size)
 filetype.Commit()
 offset_C = (mat_size*i_coord*i_size + j_coord*j_size)*MPI.FLOAT.Get_size()
-fh.Set_view(displacement, filetype=filetype)
-fh.Write_all(buffer)
+fh_C.Set_view(offset_C, filetype=filetype)
+fh_C.Write_all(buf_mat_C)
 filetype.Free()
 fh_C.Close()
 
-t_diff = MPI.Wtime() - t_start
+total_time = MPI.Wtime() - t_start
 
 comm.Barrier()
-print(t_diff)
+print(total_time)
