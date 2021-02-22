@@ -54,7 +54,6 @@ calc_start = MPI.Wtime()
 buf_mat_C = FB.sgemm(alpha=1.0, a=buf_mat_A, b=mat_B)
 
 calc_time = MPI.Wtime() - calc_start
-print(calc_time)
 
 fh_C = MPI.File.Open(comm, f"mat_C/mat_C_{mat_size}_{iteration}.txt", amode_C)
 filetype = MPI.FLOAT.Create_vector(j_size, i_size, mat_size)
@@ -68,7 +67,6 @@ fh_C.Close()
 total_time = MPI.Wtime() - t_start
 
 comm.Barrier()
-print(total_time)
 
 calc_sum = np.zeros(0)
 total_sum = np.zeros(0)
@@ -77,5 +75,5 @@ calc_sum = comm.reduce(calc_time, op=MPI.SUM, root=0)
 total_sum = comm.reduce(total_time, op=MPI.SUM, root=0)
 
 if rank == 0:
-    print(f"avg calc_time: {calc_sum/size}")
-    print(f"avg total_time: {total_sum/size}")
+    print(calc_sum/size)
+    print(total_sum/size)
