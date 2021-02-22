@@ -54,7 +54,7 @@ for time in times:
     print(temp)
     time_temp_1 = [temp[2],temp[5:7],temp[10:14],temp[19:27]]
     time_temp_2 = [temp[3],temp[7:9],temp[14:18],temp[27:35]]
-    #print(time_temp_1)
+    #print(time_temp_1) 
     print(time_temp_2)
     avg_time_1 = [temp[2],sum(temp[5:7])/2,sum(temp[10:14])/4,sum(temp[19:27])/8]
     avg_time_2 = [temp[3],sum(temp[7:9])/2,sum(temp[14:18])/4,sum(temp[27:35])/8]
@@ -65,9 +65,9 @@ for time in times:
 #------------
 speedup_mat = []
 for i in range(len(final_times_2)):
-  speedup_mat.append([])
-  for j in range(len(final_times_2[i])):
-    speedup_mat[i].append( final_times_2[i][0] / final_times_2[i][j] )
+    speedup_mat.append([])
+    for j in range(len(final_times_2[i])):
+        speedup_mat[i].append( final_times_2[i][0] / final_times_2[i][j] )
 
 print("\n\n\nSpeedup mat:")
 print(speedup_mat)
@@ -75,7 +75,7 @@ print(speedup_mat)
 no_cores = [1,2,4,8]
 
 for x in range(len(speedup_mat)):
-  plt.plot(no_cores,speedup_mat[x], label = f"Actual - {2**(x+3)}")
+    plt.plot(no_cores,speedup_mat[x], label = f"Actual - {2**(x+3)}")
 plt.plot(no_cores,no_cores, label = "Ideal")
 #plt.xlim(1,8)
 #plt.ylim(1,8)
