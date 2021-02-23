@@ -2,7 +2,6 @@
 
 for mat_size in 128 256 512 1024 2048 4096 8192 16384 32768; do
 	echo "$mat_size" >> mpi_io_results.txt
-	echo "" >> mpi_io_results.txt
 	echo "$mat_size"
 	echo ""
 	for i in 1 2 3 4 5 6 7 8 9 10; do
