@@ -11,74 +11,49 @@ for i in range(len(lines)):
     else:
         times.append('')
 
-times = times[:-1]
-
-#print(times)
 max_cores = 8
-n = np.log2(max_cores)+1
+n = int(np.log2(max_cores)+1)
 
-data=[]
+iters = 5
+
+final_times_calc = []
+final_times_total = []
+
 for time in times:
     temp = time.split(" ")
     temp = temp[:-1]
     print(temp)
-    new_time = []
-    new_time.append(int(temp[0]))
-    new_time.append(int(temp[1])-1)
-    for j in range(2,len(temp)):
-        temp[j] = float(temp[j])
-    new_time.append(max(temp[2:]))
-    data.append(new_time)
+    new_time_calc = []
+    new_time_total = []
+    for i in range(n):
+        time_sum_calc = 0
+        time_sum_total = 0
+        for j in range(iters):
+            time_sum_calc += float(temp[2+3*i+3*n*j])
+            time_sum_total += float(temp[3+3*i+3*n*j])
+        new_time_calc.append(time_sum_calc/iters)
+        new_time_total.append(time_sum_total/iters)
+    final_times_calc.append(new_time_calc)
+    final_times_total.append(new_time_total)
 
-final_times = [[]]
+assert len(final_times_calc) == len(final_times_total)
 
-current_mat_size = data[0][0]
-for i in range(0,len(data)):
-    if data[i][0] == current_mat_size:
-        final_times[-1].append(data[i][2])
-    else:
-        final_times.append([])
-        current_mat_size = data[i][0]
-        final_times[-1].append(data[i][2])
+speedup_mat_calc = []
+speedup_mat_total = []
+for i in range(len(final_times_calc)):
+    speedup_mat_calc.append([])
+    speedup_mat_total.append([])
+    for j in range(len(final_times_calc[i])):
+        speedup_mat_calc[i].append( final_times_calc[i][0] / final_times_calc[i][j] )
+        speedup_mat_total[i].append( final_times_total[i][0] / final_times_total[i][j] )
 
-#print(final_times)
+#print("\n\n\nSpeedup mat:")
+#print(speedup_mat_calc)
 
-speedup_mat = []
+no_cores = [2**i for i in range(n)]
 
-"""
-#------------
-final_times_1 = []
-final_times_2 = []
-for time in times:
-    temp = time.split(" ")
-    temp = temp[:-1]
-    for j in range(len(temp)):
-        temp[j] = float(temp[j])
-    print(temp)
-    time_temp_1 = [temp[2],temp[5:7],temp[10:14],temp[19:27]]
-    time_temp_2 = [temp[3],temp[7:9],temp[14:18],temp[27:35]]
-    #print(time_temp_1) 
-    print(time_temp_2)
-    avg_time_1 = [temp[2],sum(temp[5:7])/2,sum(temp[10:14])/4,sum(temp[19:27])/8]
-    avg_time_2 = [temp[3],sum(temp[7:9])/2,sum(temp[14:18])/4,sum(temp[27:35])/8]
-    print(avg_time_2)
-    final_times_1.append(avg_time_1)
-    final_times_2.append(avg_time_2)
-
-#------------
-speedup_mat = []
-for i in range(len(final_times_2)):
-    speedup_mat.append([])
-    for j in range(len(final_times_2[i])):
-        speedup_mat[i].append( final_times_2[i][0] / final_times_2[i][j] )
-
-print("\n\n\nSpeedup mat:")
-print(speedup_mat)
-
-no_cores = [1,2,4,8]
-
-for x in range(len(speedup_mat)):
-    plt.plot(no_cores,speedup_mat[x], label = f"Actual - {2**(x+3)}")
+for x in range(len(speedup_mat_calc)):
+    plt.plot(no_cores,speedup_mat_total[x], label = f"Actual - {2**(x+6)}")
 plt.plot(no_cores,no_cores, label = "Ideal")
 #plt.xlim(1,8)
 #plt.ylim(1,8)
@@ -86,4 +61,3 @@ plt.xlabel("Number of cores")
 plt.ylabel("Runtime speed-up")
 plt.legend()
 plt.show()
-"""
