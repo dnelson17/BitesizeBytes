@@ -14,7 +14,7 @@ for i in range(len(lines)):
 max_cores = 8
 n = int(np.log2(max_cores)+1)
 
-iters = 5
+iters = 10
 
 final_times_calc = []
 final_times_total = []
@@ -53,7 +53,7 @@ for i in range(len(final_times_calc)):
 no_cores = [2**i for i in range(n)]
 
 for x in range(len(speedup_mat_calc)):
-    plt.plot(no_cores,speedup_mat_total[x], label = f"Actual - {2**(x+6)}")
+    plt.plot(no_cores,speedup_mat_total[x], label = f"Actual - {2**(x+7)}")
 plt.plot(no_cores,no_cores, label = "Ideal")
 #plt.xlim(1,8)
 #plt.ylim(1,8)
