@@ -22,7 +22,6 @@ final_times_total = []
 for time in times:
     temp = time.split(" ")
     temp = temp[:-1]
-    print(temp)
     new_time_calc = []
     new_time_total = []
     for i in range(n):
@@ -46,9 +45,6 @@ for i in range(len(final_times_calc)):
     for j in range(len(final_times_calc[i])):
         speedup_mat_calc[i].append( final_times_calc[i][0] / final_times_calc[i][j] )
         speedup_mat_total[i].append( final_times_total[i][0] / final_times_total[i][j] )
-
-#print("\n\n\nSpeedup mat:")
-#print(speedup_mat_calc)
 
 no_cores = [2**i for i in range(n)]
 
