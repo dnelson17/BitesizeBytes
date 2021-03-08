@@ -2,7 +2,6 @@ from mpi4py import MPI
 import time
 import numpy as np
 import sys
-from scipy.linalg import blas as FB
 
 # ssh -XY 40199787@aigis.mp.qub.ac.uk
 # 
@@ -14,15 +13,29 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-mat_size = int( sys.argv[1])
+def matrix_mult(mat_A, mat_B):
+    mat_C = np.zeros((mat_A.shape[0],mat_B.shape[1]))
+    for i in range(len(mat_A)):
+        for j in range(len(mat_B[i])):
+            for k in range(len(mat_B)):
+                mat_C[i,j] += mat_A[i][k] * mat_B[k][j]
+    return mat_C
 
-total_start = MPI.Wtime()
+
+numberRows = int( sys.argv[1])
+numberColumns = int( sys.argv[2])
+
+assert numberRows == numberColumns
+
+mat_size = numberRows
 
 # Initialize the 2 random matrices only if this is rank 0
 if rank == 0:
     mat_A = np.random.rand(mat_size,mat_size)
     mat_B = np.random.rand(mat_size,mat_size)
     ans = np.matmul(mat_A,mat_B)
+    
+    t_start = MPI.Wtime()
     
     power = np.log2(size)/2
     i_len = int(2**(np.ceil(power)))
@@ -40,36 +53,13 @@ else:
 
 mats = comm.scatter(send_list,root=0)
 
-calc_start = MPI.Wtime()
-
-mat_C = FB.sgemm(alpha=1.0, a=mats[0], b=mats[1])
-
-calc_finish = MPI.Wtime()
+mat_C = matrix_mult(mats[0],mats[1])
 
 res_list = comm.gather(mat_C,root=0)
 
 if rank == 0:
     res = np.vstack( np.split( np.concatenate(res_list,axis=1) , i_len, axis=1) )
-    total_finish = MPI.Wtime()
-
-scatter_time = calc_start - total_start
-calc_time = calc_finish - calc_start
-gather_time = total_finish - calc_finish
-
-scatter_sum = np.zeros(0)
-calc_sum = np.zeros(0)
-gather_sum = np.zeros(0)
-
-scatter_sum = comm.reduce(scatter_time, op=MPI.SUM, root=0)
-calc_sum = comm.reduce(calc_time, op=MPI.SUM, root=0)
-gather_sum = comm.reduce(gather_time, op=MPI.SUM, root=0)
-
-if rank == 0:
-    print(scatter_sum/size)
-    print(calc_sum/size)
-    print(gather_sum/size)
-
-
-
-#print(np.array_equal(res, ans))
+    t_diff = MPI.Wtime() - t_start
+    print(t_diff)
+    #print(np.array_equal(res, ans))
     

@@ -25,7 +25,6 @@ def gen_time_results(mat_size,max_cores,no_runs):
             i_size = int(mat_size/i_len)
             j_size = int(mat_size/j_len)
             start = time.perf_counter()
-            param = []
             if __name__ == '__main__':
                 send_list = []
                 for i in range(i_len):

@@ -22,12 +22,8 @@ def matrix_mult(mat_A, mat_B):
     return mat_C
 
 
-numberRows = int( sys.argv[1])
-numberColumns = int( sys.argv[2])
+mat_size = int( sys.argv[1])
 
-assert numberRows == numberColumns
-
-mat_size = numberRows
 
 # Initialize the 2 random matrices only if this is rank 0
 if rank == 0:
