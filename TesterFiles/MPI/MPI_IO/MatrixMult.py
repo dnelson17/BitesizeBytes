@@ -4,8 +4,10 @@ import numpy as np
 import sys
 from scipy.linalg import blas as FB
 
-# cd BitesizeBytes/LearningPythonMPI/MPI_IO
-# /usr/bin/mpiexec -n 4 python3 MatrixMult_MPI_IO.py 4 4
+# mpiexec -n 4 python MatrixMult.py 4 1
+
+# cd BitesizeBytes/TesterFiles/MPI/MPI_IO
+# /usr/bin/mpiexec -n 4 python3 MatrixMult.py 4 1
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -51,12 +53,12 @@ fh_B.Close()
 
 calc_start = MPI.Wtime()
 
-buf_mat_C = FB.sgemm(alpha=1.0, a=buf_mat_A, b=mat_B)
+buf_mat_C = np.ascontiguousarray(FB.sgemm(alpha=1.0, a=buf_mat_A, b=mat_B))
 
 calc_finish = MPI.Wtime()
 
 fh_C = MPI.File.Open(comm, f"mat_C/mat_C_{mat_size}_{iteration}.txt", amode_C)
-filetype = MPI.FLOAT.Create_vector(j_size, i_size, mat_size)
+filetype = MPI.FLOAT.Create_vector(i_size, j_size, mat_size)
 filetype.Commit()
 offset_C = (mat_size*i_coord*i_size + j_coord*j_size)*MPI.FLOAT.Get_size()
 fh_C.Set_view(offset_C, filetype=filetype)
