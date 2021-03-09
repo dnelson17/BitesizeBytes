@@ -22,7 +22,7 @@ total_start = MPI.Wtime()
 if rank == 0:
     mat_A = np.random.rand(mat_size,mat_size)
     mat_B = np.random.rand(mat_size,mat_size)
-    ans = np.matmul(mat_A,mat_B)
+    #ans = np.matmul(mat_A,mat_B)
     
     power = np.log2(size)/2
     i_len = int(2**(np.ceil(power)))
@@ -33,6 +33,8 @@ if rank == 0:
     for i in range(i_len):
         for j in range(j_len):
             send_list.append([send_list_A[i],send_list_B[j]])
+    #mat_A = None
+    #mat_B = None
 else:
     mat_A = None
     mat_B = None
@@ -50,7 +52,8 @@ res_list = comm.gather(mat_C,root=0)
 
 if rank == 0:
     res = np.vstack( np.split( np.concatenate(res_list,axis=1) , i_len, axis=1) )
-    total_finish = MPI.Wtime()
+
+total_finish = MPI.Wtime()
 
 scatter_time = calc_start - total_start
 calc_time = calc_finish - calc_start
@@ -68,8 +71,6 @@ if rank == 0:
     print(scatter_sum/size)
     print(calc_sum/size)
     print(gather_sum/size)
-
-
 
 #print(np.array_equal(res, ans))
     

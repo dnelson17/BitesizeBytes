@@ -62,6 +62,7 @@ for mat_size in mat_sizes[:-3]:#
     print(total_time_my_func_1/no_runs)
 print("\n")
 
+"""
 print("----My Version - 32 Cores----")
 for mat_size in mat_sizes[:-3]:#
     total_time_my_func_32 = 0
@@ -72,7 +73,7 @@ for mat_size in mat_sizes[:-3]:#
         #assert m3.all() == ans.all()
     print(total_time_my_func_32/no_runs)
 print("\n")
-
+"""
 
 print("----NumPy----")
 for mat_size in mat_sizes:
