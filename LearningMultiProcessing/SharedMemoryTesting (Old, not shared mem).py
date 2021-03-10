@@ -44,7 +44,8 @@ def gen_time_results(mat_size,max_cores,no_runs):
 def main():
     #size_list = [32,64,128,256,512,1024,2048]
     #size_list = [32,64,128,256,512,1024]
-    size_list = [2048,4096,8192,16384,32768]
+    #size_list = [2048,4096,8192,16384,32768]
+    size_list = [16384]
     total = 0
     for mat_size in size_list:
         print(f"{mat_size}")

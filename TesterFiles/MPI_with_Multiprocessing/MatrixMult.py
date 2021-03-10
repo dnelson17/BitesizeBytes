@@ -21,7 +21,7 @@ amode_C = MPI.MODE_WRONLY|MPI.MODE_CREATE
 mat_size = int(sys.argv[1])
 iteration = int(sys.argv[2])
 
-#Assuming the number of processors is of size 2^n for int n, we take log2 to find the value of n
+#Assuming the matrix is of size 2^n for int N, we take log2 to find the value of n
 power = np.log2(size)/2
 #the number of partitons that must be calculated in the result matrix C in the i and j dimensions
 pars_i = int(2**(np.ceil(power)))

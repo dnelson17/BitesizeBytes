@@ -1,26 +1,23 @@
-from multiprocessing import Pool, RawArray
+from multiprocessing import Pool, shared_memory
 import time
 import numpy as np
 from scipy.linalg import blas as FB
 
 # cd C:\University\Project\BitesizeBytes\TesterFiles\Multiprocessing
-# python3 SharedMemoryTestingLAPACK.py
+# python3 SharedMemoryTestingMyFunc.py
 
-# A global dictionary storing the variables passed from the initializer.
-var_dict = {}
-
-def init_worker(mat_A, mat_B):
-    # Using a dictionary is not strictly necessary. You can also
-    # use global variables.
-    var_dict['A'] = mat_A
-    var_dict['B'] = mat_B
-    
-
-def matrix_mult(i1,i2,j1,j2,mat_size):
-    A_np = np.frombuffer(var_dict['A'],dtype=np.float32).reshape((mat_size,mat_size))
-    B_np = np.frombuffer(var_dict['B'],dtype=np.float32).reshape((mat_size,mat_size))
-    #mat_C = np.zeros((i2-i1,j2-j1))
-    mat_C = FB.sgemm(alpha=1.0, a=A_np[i1:i2,:], b=B_np[:,j1:j2])
+def matrix_mult(i1,i_size,j1,j_size,mat_size,name_A,name_B):
+    existing_shm_A = shared_memory.SharedMemory(name=name_A)
+    existing_shm_B = shared_memory.SharedMemory(name=name_B)
+    mat_A = np.ndarray((mat_size,mat_size), dtype=np.float32, buffer=existing_shm_A.buf)[i1*i_size:(i1+1)*i_size,:]
+    mat_B = np.ndarray((mat_size,mat_size), dtype=np.float32, buffer=existing_shm_B.buf)[:,j1*j_size:(j1+1)*j_size]
+    mat_C = np.zeros((i_size,j_size))
+    for i in range(i_size):
+        for j in range(j_size):
+            for k in range(mat_size):
+                mat_C[i,j] += mat_A[i][k] * mat_B[k][j]
+    existing_shm_A.close()
+    existing_shm_B.close()
     return mat_C
 
 
@@ -30,12 +27,12 @@ def gen_time_results(mat_size, core_list, no_runs):
             mat_shape = (mat_size,mat_size)
             data_A = np.random.rand(*mat_shape).astype(np.float32)
             data_B = np.random.rand(*mat_shape).astype(np.float32)
-            A = RawArray( 'f' , mat_shape[0] * mat_shape[1] )
-            B = RawArray( 'f' , mat_shape[0] * mat_shape[1] )
-            A_np = np.frombuffer( A, dtype = np.float32 ).reshape(mat_shape)
-            B_np = np.frombuffer( B, dtype = np.float32 ).reshape(mat_shape)
-            np.copyto(A_np, data_A)
-            np.copyto(B_np, data_B)
+            shm_A = shared_memory.SharedMemory(create=True, size=data_A.nbytes)
+            shm_B = shared_memory.SharedMemory(create=True, size=data_A.nbytes)
+            mat_A = np.ndarray(data_A.shape, dtype=data_A.dtype, buffer=shm_A.buf)
+            mat_B = np.ndarray(data_B.shape, dtype=data_B.dtype, buffer=shm_B.buf)
+            name_A = shm_A.name
+            name_B = shm_B.name
             for no_cores in core_list:
                 print(no_cores)
                 #Assuming the matrix is of size 2^n for int N, we take log2 to find the value of n
@@ -50,20 +47,24 @@ def gen_time_results(mat_size, core_list, no_runs):
                 send_list = []
                 for i in range(pars_i):
                     for j in range(pars_j):
-                        send_list.append([i*i_size,(i+1)*i_size,j*j_size,(j+1)*j_size,mat_size])
-                p = Pool(processes=no_cores, initializer=init_worker, initargs=(A, B))
+                        send_list.append([i,i_size,j,j_size,mat_size,name_A,name_B])
+                p = Pool(processes=no_cores)
                 res_list = p.starmap(matrix_mult, send_list)
                 p.close()
                 result = np.vstack( np.split( np.concatenate(res_list,axis=1) , pars_i, axis=1) )
                 finish = time.perf_counter()
                 time_taken = round(finish-start,10)
                 print(time_taken)
+            shm_A.close()
+            shm_B.close()
+            shm_A.unlink()
+            shm_B.unlink()
     print("")
     return None
 
 
 def main():
-    size_list = [2**i for i in range(5,15)]
+    size_list = [2**i for i in range(5,13)]
     core_list = [2**i for i in range(4)]
     no_runs = 1
     for mat_size in size_list:
