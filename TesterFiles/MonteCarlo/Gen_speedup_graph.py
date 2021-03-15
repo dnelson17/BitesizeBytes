@@ -1,10 +1,10 @@
 from matplotlib import pyplot as plt
 import pandas as pd
 
-program_type = "lapack"
-#program_type = "myfunc"
+program_type = "strong"
+#program_type = "weak"
 
-speedup_df = pd.read_pickle(f"speedup_df_{program_type}.pkl")
+speedup_df = pd.read_pickle(f"speedup_df_{program_type}_scaling.pkl")
 print(speedup_df)
 
 speedup_df = speedup_df.T
@@ -15,4 +15,4 @@ plt.xlabel("Number of Cores")
 plt.ylabel("Runtime Speedup")
 plt.legend()
 #plt.show()
-plt.savefig(f"multiprocessing_speedup_{program_type}.jpeg", dpi=1000)
+plt.savefig(f"montecarlo_speedup_{program_type}_scaling.jpeg", dpi=1000)

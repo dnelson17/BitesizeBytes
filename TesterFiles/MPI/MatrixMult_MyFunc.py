@@ -24,16 +24,20 @@ def matrix_mult(mat_A, mat_B):
 
 mat_size = int(sys.argv[1])
 
-total_start = MPI.Wtime()
+if rank == 0:
+    #need to update this to match bash script
+    core_list = [2**j for j in range(6)]
+    time_df = pd.DataFrame(columns=core_list)
 
 # Initialize the 2 random matrices only if this is rank 0
 if rank == 0:
     mat_A = np.random.rand(mat_size,mat_size).astype(np.float32)
     mat_B = np.random.rand(mat_size,mat_size).astype(np.float32)
     #ans = np.matmul(mat_A,mat_B)
-    
-    t_start = MPI.Wtime()
-    
+
+total_start = MPI.Wtime()
+
+if rank == 0:
     power = np.log2(size)/2
     pars_i = int(2**(np.ceil(power)))
     pars_j = int(2**(np.floor(power)))

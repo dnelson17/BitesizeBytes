@@ -1,15 +1,8 @@
-from multiprocessing import Pool
+from multiprocessing import Pool, shared_memory
 from scipy.linalg import blas as FB
+import pandas as pd
 import numpy as np
 import time
-
-mat_sizes = [32,64,128,256,512,1024,2048]
-no_runs = 10
-
-#m1 = np.random.rand(mat_size,mat_size)
-#m2 = np.random.rand(mat_size,mat_size)
-
-#ans = np.matmul(m1,m2)
 
 def matrix_mult(mat_A, mat_B):
     mat_C = np.zeros((mat_A.shape[0],mat_B.shape[1]))
@@ -20,106 +13,100 @@ def matrix_mult(mat_A, mat_B):
     return mat_C
 
 
-def gen_time_results(mat_size,no_cores):
-    mat_A = np.random.rand(mat_size,mat_size)
-    mat_B = np.random.rand(mat_size,mat_size)
+def matrix_mult_parallel(i1,i_size,j1,j_size,mat_size,name_A,name_B):
+    existing_shm_A = shared_memory.SharedMemory(name=name_A)
+    existing_shm_B = shared_memory.SharedMemory(name=name_B)
+    mat_A = np.ndarray((mat_size,mat_size), dtype=np.float32, buffer=existing_shm_A.buf)[i1*i_size:(i1+1)*i_size,:]
+    mat_B = np.ndarray((mat_size,mat_size), dtype=np.float32, buffer=existing_shm_B.buf)[:,j1*j_size:(j1+1)*j_size]
+    mat_C = np.zeros((i_size,j_size))
+    for i in range(i_size):
+        for j in range(j_size):
+            for k in range(mat_size):
+                mat_C[i,j] += mat_A[i][k] * mat_B[k][j]
+    existing_shm_A.close()
+    existing_shm_B.close()
+    return mat_C
+
+
+def gen_time_results(mat_size, no_cores, data_A, data_B):
+    mat_shape = (mat_size,mat_size)
+    shm_A = shared_memory.SharedMemory(create=True, size=data_A.nbytes)
+    shm_B = shared_memory.SharedMemory(create=True, size=data_A.nbytes)
+    mat_A = np.ndarray(data_A.shape, dtype=data_A.dtype, buffer=shm_A.buf)
+    mat_B = np.ndarray(data_B.shape, dtype=data_B.dtype, buffer=shm_B.buf)
+    name_A = shm_A.name
+    name_B = shm_B.name
     #Assuming the matrix is of size 2^n for int N, we take log2 to find the value of n
     power = np.log2(no_cores)/2
     #Represents the number of partitons that must be calculated in the result matrix C
-    i_len = int(2**(np.ceil(power)))
-    j_len = int(2**(np.floor(power)))
+    pars_i = int(2**(np.ceil(power)))
+    pars_j = int(2**(np.floor(power)))
     #Represents the size of each partiton in the i and j axis
-    i_size = int(mat_size/i_len)
-    j_size = int(mat_size/j_len)
-    if __name__ == '__main__':
-        send_list = []
-        for i in range(i_len):
-            for j in range(j_len):
-                send_list.append([mat_A[i*i_size:(i+1)*i_size,:],mat_B[:,j*j_size:(j+1)*j_size]])
-        start = time.perf_counter()
-        p = Pool(processes=no_cores)
-        res_list = p.starmap(matrix_mult, send_list)
-        p.close()
-        finish = time.perf_counter()
-        result = np.vstack( np.split( np.concatenate(res_list,axis=1) , i_len, axis=1) )
-        time_taken = round(finish-start,10)
+    i_size = int(mat_size/pars_i)
+    j_size = int(mat_size/pars_j)
+    send_list = []
+    for i in range(pars_i):
+        for j in range(pars_j):
+            send_list.append([i,i_size,j,j_size,mat_size,name_A,name_B])
+    start = time.perf_counter()
+    p = Pool(processes=no_cores)
+    res_list = p.starmap(matrix_mult_parallel, send_list)
+    p.close()
+    result = np.vstack( np.split( np.concatenate(res_list,axis=1) , pars_i, axis=1) )
+    finish = time.perf_counter()
+    time_taken = round(finish-start,10)
+    shm_A.close()
+    shm_B.close()
+    shm_A.unlink()
+    shm_B.unlink()
     return time_taken, result
 
 
-print("----My Version - 1 Cores----")
-for mat_size in mat_sizes[:-3]:#
-    total_time_my_func_1 = 0
-    print(f"Mat size: {mat_size}")
-    for _ in range(no_runs):
-        m1 = np.random.rand(mat_size,mat_size)
-        m2 = np.random.rand(mat_size,mat_size)
-        start = time.perf_counter()
-        m3 = matrix_mult(m1,m2)
-        finish = time.perf_counter()
-        time_taken = round(finish-start,8)
-        total_time_my_func_1 += time_taken
-        #assert m3.all() == ans.all()
-    print(total_time_my_func_1/no_runs)
-print("\n")
-
-"""
-print("----My Version - 32 Cores----")
-for mat_size in mat_sizes[:-3]:#
-    total_time_my_func_32 = 0
-    print(f"Mat size: {mat_size}")
-    for _ in range(no_runs):
-        time_taken, m3 = gen_time_results(mat_size,8)#Should be 32
-        total_time_my_func_32 += time_taken
-        #assert m3.all() == ans.all()
-    print(total_time_my_func_32/no_runs)
-print("\n")
-"""
-
-print("----NumPy----")
-for mat_size in mat_sizes:
-    print(f"Mat size: {mat_size}")
-    total_time_Numpy = 0
-    for _ in range(no_runs):
-        m1 = np.random.rand(mat_size,mat_size)
-        m2 = np.random.rand(mat_size,mat_size)
-        start = time.perf_counter()
-        mn = np.matmul(m1,m2)
-        finish = time.perf_counter()
-        time_taken = round(finish-start,8)
-        total_time_Numpy += time_taken
-        #assert mn.all() == ans.all()
-    print(total_time_Numpy/no_runs)
-print("\n")
-
-print("----LAPACK DGEMM----")
-for mat_size in mat_sizes:
-    print(f"Mat size: {mat_size}")
-    total_time_DGEMM = 0
-    for _ in range(no_runs):
-        m1 = np.random.rand(mat_size,mat_size)
-        m2 = np.random.rand(mat_size,mat_size)
-        start = time.perf_counter()
-        md = FB.dgemm(alpha=1, a=m1, b=m2)
-        finish = time.perf_counter()
-        time_taken = round(finish-start,8)
-        total_time_DGEMM += time_taken
-        #assert md.all() == ans.all()
-    print(total_time_DGEMM/no_runs)
-print("\n")
+def main():
+    size_list = [2**i for i in range(5,10)]
+    no_runs = 10
+    time_df = pd.DataFrame(columns=["My function","My function (32 Cores)","Numpy MatMul","Lapack dgemm","Lapack sgemm"])
+    for mat_size in size_list:
+        print(f"Mat size: {mat_size}")
+        for _ in range(no_runs):
+            total_time_Numpy = 0
+            m1 = np.random.rand(mat_size,mat_size)
+            m2 = np.random.rand(mat_size,mat_size)
+            new_times=[]
+            
+            my_func_start = time.perf_counter()
+            m_myfunc = matrix_mult(m1,m2)
+            my_func_finish = time.perf_counter()
+            new_times.append(round(my_func_finish-my_func_start,8))
+            
+            my_func_32cores_start = time.perf_counter()
+            time_taken, m_myfunc32 = gen_time_results(mat_size,32,m1,m2)
+            my_func_32cores_finish = time.perf_counter()
+            new_times.append(round(my_func_32cores_finish-my_func_32cores_start,8))
+            
+            numpy_start = time.perf_counter()
+            mn = np.matmul(m1,m2)
+            numpy_finish = time.perf_counter()
+            new_times.append(round(numpy_finish-numpy_start,8))
+            
+            dgemm_start = time.perf_counter()
+            md = FB.dgemm(alpha=1, a=m1, b=m2)
+            dgemm_finish = time.perf_counter()
+            new_times.append(round(dgemm_finish-dgemm_start,8))
+            
+            sgemm_start = time.perf_counter()
+            ms = FB.sgemm(alpha=1, a=m1, b=m2)
+            sgemm_finish = time.perf_counter()
+            new_times.append(round(sgemm_finish-sgemm_start,8))
+            
+            time_df = time_df.append( pd.DataFrame([new_times],columns=["My function","My function (32 Cores)","Numpy MatMul","Lapack dgemm","Lapack sgemm"],index=[mat_size]) )
+            time_df.to_pickle("time_df_libraries.pkl")
+    print(f"\nOriginal times:\n{time_df}")
+    time_df = time_df.sort_index()
+    time_df = time_df.groupby(time_df.index).mean()
+    print(f"\nTimes after ordering and mean:\n{time_df}")
+    time_df.to_pickle("time_df_libraries.pkl")
 
 
-print("---- LAPACK SGEMM----")
-for mat_size in mat_sizes:
-    print(f"Mat size: {mat_size}")
-    total_time_SGEMM = 0
-    for _ in range(no_runs):
-        m1 = np.random.rand(mat_size,mat_size)
-        m2 = np.random.rand(mat_size,mat_size)
-        start = time.perf_counter()
-        ms = FB.sgemm(alpha=1, a=m1, b=m2)
-        finish = time.perf_counter()
-        time_taken = round(finish-start,8)
-        total_time_SGEMM += time_taken
-        #assert ms.all() == ans.all()
-    print(total_time_SGEMM/no_runs)
-print("\n")
+if __name__ == '__main__':
+    main()
