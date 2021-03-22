@@ -7,6 +7,9 @@ program_type = "lapack"
 speedup_df = pd.read_pickle(f"speedup_df_{program_type}.pkl")
 print(speedup_df)
 
+speedup_df = speedup_df.drop([32,64])
+print(speedup_df)
+
 speedup_df = speedup_df.T
 print(speedup_df)
 

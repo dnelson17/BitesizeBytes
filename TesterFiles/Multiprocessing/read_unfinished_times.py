@@ -1,7 +1,7 @@
 import pandas as pd
 
-#program_type = "lapack"
-program_type = "myfunc"
+program_type = "lapack"
+#program_type = "myfunc"
 
 core_list = [2**j for j in range(6)]
 

@@ -4,12 +4,22 @@ import numpy as np
 import time
 import sys
 
+#def monte_carlo(attempts):
+#    dots = np.square( np.random.rand(attempts,2) )
+#    hits = 0
+#    for pair in dots:
+#        if np.sum(pair) <= 1:
+#            hits += 1
+#    return hits
+
 def monte_carlo(attempts):
-    dots = np.square( np.random.rand(attempts,2) )
+    i = 0
     hits = 0
-    for pair in dots:
-        if np.sqrt( np.sum(pair) ) <= 1:
+    while i < attempts:
+        dots = np.random.rand(1,2)
+        if dots[0][0]**2 + dots[0][1]**2 <= 1:
             hits += 1
+        i += 1
     return hits
 
 
@@ -23,9 +33,12 @@ def gen_time_results(attempts, no_cores, strong_scaling):
     p = Pool(processes=no_cores)
     hits_list = p.starmap(monte_carlo, (send_list))
     p.close()
-    total_hits = np.sum(hits_list)
-    approx_pi = 4*total_hits/attempts
     finish = time.perf_counter()
+    total_hits = np.sum(hits_list)
+    if strong_scaling:
+        approx_pi = 4*total_hits/attempts
+    else:
+        approx_pi = 4*total_hits/(attempts*no_cores)
     print(f"Estimation: {approx_pi}")
     time_taken = round(finish-start,10)
     print(f"Time: {time_taken}\n")
@@ -35,8 +48,8 @@ def gen_time_results(attempts, no_cores, strong_scaling):
 def main():
     attempts_list = [10**n for n in range(1,9)]
     core_list = [2**i for i in range(6)]
-    time_df = pd.DataFrame(columns=core_list)
     for scaling_type in [True, False]:
+        time_df = pd.DataFrame(columns=core_list)
         for attempts in attempts_list:
             print(f"Attempts = 10^{int(np.log10(attempts))}")
             new_times = []
@@ -53,10 +66,11 @@ def main():
         time_df = time_df.sort_index()
         time_df = time_df.groupby(time_df.index).mean()
         print(f"\nTimes after ordering and mean:\n{time_df}")
-        speedup_df = time_df.apply(lambda x: x.iloc[0]/x, axis=1, result_type='expand')
         if scaling_type:
+            speedup_df = time_df.apply(lambda x: x.iloc[0]/x, axis=1, result_type='expand')
             ideal_df = pd.DataFrame([core_list],columns=core_list,index=["Ideal"])
         else:
+            speedup_df = time_df.apply(lambda x: x/x.iloc[0], axis=1, result_type='expand')
             ideal_df = pd.DataFrame([[1 for _ in range(6)]],columns=core_list,index=["Ideal"])
         print(f"\nIdeal:\n{ideal_df}")
         speedup_df = speedup_df.append( ideal_df )
