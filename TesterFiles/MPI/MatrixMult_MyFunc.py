@@ -116,4 +116,3 @@ if rank == 0:
     total_df.to_pickle("total_df.pkl")
 
 #print(np.array_equal(res, ans))
-

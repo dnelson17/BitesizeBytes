@@ -29,4 +29,5 @@ plt.plot(np.cos(t), np.sin(t), linewidth=5)
 
 plt.gca().set_aspect('equal')
 
-plt.savefig(f"MonteCarlo_Pi.png", dpi=1000)
+#plt.savefig("C:\\University\\Project\\BitesizeBytes\\TesterFiles\\Figures\\MonteCarlo_Pi.png", dpi=1000)
+plt.savefig("MonteCarlo_Pi.png", dpi=1000)
