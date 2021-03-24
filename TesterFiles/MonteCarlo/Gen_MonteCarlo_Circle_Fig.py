@@ -27,4 +27,6 @@ plt.scatter(misses_x,misses_y,color=["red"],s=4)
 t = np.linspace(0,np.pi/2,100)
 plt.plot(np.cos(t), np.sin(t), linewidth=5)
 
+plt.gca().set_aspect('equal')
+
 plt.savefig(f"MonteCarlo_Pi.png", dpi=1000)

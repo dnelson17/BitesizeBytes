@@ -73,16 +73,43 @@ comm.Barrier()
 read_time = calc_start - io_start
 calc_time = calc_finish - calc_start
 write_time = io_finish - calc_finish
+total_time = io_finish - io_start
 
 read_sum = np.zeros(0)
 calc_sum = np.zeros(0)
 write_sum = np.zeros(0)
+total_sum = np.zeros(0)
 
 read_sum = comm.reduce(read_time, op=MPI.SUM, root=0)
 calc_sum = comm.reduce(calc_time, op=MPI.SUM, root=0)
 write_sum = comm.reduce(write_time, op=MPI.SUM, root=0)
+total_sum = comm.reduce(total_time, op=MPI.SUM, root=0)
 
 if rank == 0:
+    #Must update this with whatever the max is in the bash file
+    read_df = pd.read_pickle("read_df.pkl")
+    calc_df = pd.read_pickle("calc_df.pkl")
+    write_df = pd.read_pickle("write_df.pkl")
+    total_df = pd.read_pickle("total_df.pkl")
+    max_cores = 32
+    core_list = [2**j for j in range(np.log2(max_cores))]
+    if size == 1:
+        #add a new line with a new val at the left
+        read_df = read_df.append( pd.DataFrame([(read_sum/size) if i==0 else 0 for i in range(max_cores)],columns=core_list, index=[max_size]) )
+        calc_df = calc_df.append( pd.DataFrame([(calc_sum/size) if i==0 else 0 for i in range(max_cores)],columns=core_list, index=[max_size]) )
+        write_df = write_df.append( pd.DataFrame([(write_sum/size) if i==0 else 0 for i in range(max_cores)],columns=core_list, index=[max_size]) )
+        total_df = total_df.append( pd.DataFrame([(total_sum/size) if i==0 else 0 for i in range(max_cores)],columns=core_list, index=[max_size]) )
+    elif size > 1:
+        #add new value at right place
+        read_df.iloc[mat_size, df.columns.get_loc(str(size))] = (read_sum/size)
+        calc_df.iloc[mat_size, df.columns.get_loc(str(size))] = (calc_sum/size)
+        write_df.iloc[mat_size, df.columns.get_loc(str(size))] = (write_sum/size)
+        total_df.iloc[mat_size, df.columns.get_loc(str(size))] = (total_sum/size)
     print(read_sum/size)
     print(calc_sum/size)
     print(write_sum/size)
+    print(total_sum/size)
+    read_df.to_pickle("read_df.pkl")
+    calc_df.to_pickle("calc_df.pkl")
+    write_df.to_pickle("write_df.pkl")
+    total_df.to_pickle("total_df.pkl")
