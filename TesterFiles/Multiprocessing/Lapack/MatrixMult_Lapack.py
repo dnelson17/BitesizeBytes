@@ -71,7 +71,7 @@ def gen_time_results(mat_size, core_list):
 
 
 def main():
-    size_list = [2**i for i in range(5,16)]
+    size_list = [2**i for i in range(7,16)]
     core_list = [2**j for j in range(6)]
     no_runs = 10
     send_time_df = pd.DataFrame(columns=core_list)
