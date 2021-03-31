@@ -5,8 +5,15 @@ program_type = "lapack"
 
 core_list = [2**j for j in range(6)]
 
-time_df = pd.read_pickle(f"time_df_{program_type}.pkl")
-print(time_df)
+pkl_list = ["Lapack/send_time_df_lapack.pkl","Lapack/calc_time_df_lapack.pkl","Lapack/recv_time_df_lapack.pkl","Lapack/total_time_df_lapack.pkl"]
+
+for pkl_name in pkl_list:
+    print(pkl_name)
+    time_df = pd.read_pickle(pkl_name)
+    time_df = time_df.sort_index()
+    time_df = time_df.groupby(time_df.index).mean()
+    print(time_df.to_string())
+
 """
 time_df = time_df.sort_index()
 time_df = time_df.groupby(time_df.index).mean()
