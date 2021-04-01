@@ -1,17 +1,18 @@
 from multiprocessing import Pool
 import pandas as pd
 import numpy as np
+import random
 import time
 import sys
 
 def monte_carlo(attempts):
     i = 0
     hits = 0
-    while i < attempts:
-        dots = np.random.rand(1,2)
-        if dots[0][0]**2 + dots[0][1]**2 <= 1:
+    for i in range(0,attempts):
+        x = random.uniform(0, 1)
+        y = random.uniform(0, 1)
+        if x**2 + y**2 <= 1:
             hits += 1
-        i += 1
     return hits
 
 
@@ -32,7 +33,7 @@ def gen_time_results(attempts, no_cores):
 
 
 def main():
-    attempts_list = [10**n for n in range(1,9)]
+    attempts_list = [10**n for n in range(4,11)]
     core_list = [2**i for i in range(6)]
     time_df = pd.DataFrame(columns=core_list)
     for attempts in attempts_list:

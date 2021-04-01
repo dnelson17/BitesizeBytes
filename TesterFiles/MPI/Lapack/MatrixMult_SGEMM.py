@@ -1,14 +1,9 @@
-from mpi4py import MPI
-import time
-import numpy as np
-import sys
 from scipy.linalg import blas as FB
-
-# ssh -XY 40199787@aigis.mp.qub.ac.uk
-# 
-# ssh aigis06
-# cd BitesizeBytes/LearningPythonMPI
-# /usr/bin/mpiexec -n 4 python3 MatrixMult_SGEMM.py 4
+from mpi4py import MPI
+import pandas as pd
+import numpy as np
+import time
+import sys
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -78,23 +73,23 @@ if rank == 0:
     gather_df = pd.read_pickle("gather_df.pkl")
     total_df = pd.read_pickle("total_df.pkl")
     max_cores = 32
-    core_list = [2**j for j in range(np.log2(max_cores))]
+    core_list = [2**j for j in range(int(np.log2(max_cores))+1)]
     if size == 1:
         #add a new line with a new val at the left
-        scatter_df = scatter_df.append( pd.DataFrame([(scatter_sum/size) if i==0 else 0 for i in range(max_cores)],columns=core_list, index=[max_size]) )
-        calc_df = calc_df.append( pd.DataFrame([(calc_sum/size) if i==0 else 0 for i in range(max_cores)],columns=core_list, index=[max_size]) )
-        gather_df = gather_df.append( pd.DataFrame([(gather_sum/size) if i==0 else 0 for i in range(max_cores)],columns=core_list, index=[max_size]) )
-        total_df = total_df.append( pd.DataFrame([(total_sum/size) if i==0 else 0 for i in range(max_cores)],columns=core_list, index=[max_size]) )
+        scatter_df = scatter_df.append( pd.DataFrame([[scatter_sum/size if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        calc_df = calc_df.append( pd.DataFrame([[calc_sum/size if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        gather_df = gather_df.append( pd.DataFrame([[gather_sum/size if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        total_df = total_df.append( pd.DataFrame([[total_sum/size if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
     elif size > 1:
         #add new value at right place
-        scatter_df.iloc[mat_size, df.columns.get_loc(str(size))] = (scatter_sum/size)
-        calc_df.iloc[mat_size, df.columns.get_loc(str(size))] = (calc_sum/size)
-        gather_df.iloc[mat_size, df.columns.get_loc(str(size))] = (gather_sum/size)
-        total_df.iloc[mat_size, df.columns.get_loc(str(size))] = (total_sum/size)
-    print(scatter_sum/size)
-    print(calc_sum/size)
-    print(gather_sum/size)
-    print(total_sum/size)
+        scatter_df.iloc[-1, str(size)] = (scatter_sum/size)
+        calc_df.iloc[-1, str(size)] = (calc_sum/size)
+        gather_df.iloc[-1, str(size)] = (gather_sum/size)
+        total_df.iloc[-1, str(size)] = (total_sum/size)
+    print(f"scatter: {scatter_sum/size}")
+    print("calc: {calc_sum/size}")
+    print(f"gather: {gather_sum/size}")
+    print(f"total: {total_sum/size}")
     scatter_df.to_pickle("scatter_df.pkl")
     calc_df.to_pickle("calc_df.pkl")
     gather_df.to_pickle("gather_df.pkl")

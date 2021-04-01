@@ -1,7 +1,6 @@
 import pandas as pd
 
 core_list = [2**j for j in range(6)]
-weak_list = [1 for _ in range(6)]
 
 time_df = pd.read_pickle("time_df_strong_scaling.pkl")
 print(time_df)
