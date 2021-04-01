@@ -51,22 +51,19 @@ if rank == 0:
 
 total_finish = MPI.Wtime()
 
-scatter_time = calc_start - total_start
-calc_time = calc_finish - calc_start
-gather_time = total_finish - calc_finish
-total_time = total_finish - total_start
+print(f"rank: {rank}, total_start: {total_start}, calc_start: {calc_start}, calc_finish: {calc_finish}, total_finish: {total_finish}")
 
-scatter_sum = np.zeros(0)
-calc_sum = np.zeros(0)
-gather_sum = np.zeros(0)
-total_sum = np.zeros(0)
-
-scatter_sum = comm.reduce(scatter_time, op=MPI.SUM, root=0)
-calc_sum = comm.reduce(calc_time, op=MPI.SUM, root=0)
-gather_sum = comm.reduce(gather_time, op=MPI.SUM, root=0)
-total_sum = comm.reduce(total_time, op=MPI.SUM, root=0)
+total_start_min = comm.reduce(total_start, op=MPI.MIN, root=0)
+calc_start_min = comm.reduce(calc_start, op=MPI.MIN, root=0)
+calc_finish_max = comm.reduce(calc_finish, op=MPI.MAX, root=0)
+total_finish_max = comm.reduce(total_finish, op=MPI.MAX, root=0)
 
 if rank == 0:
+    print(f"total_start: {total_start_min}, calc_start: {calc_start_min}, calc_finish: {calc_finish_max}, total_finish: {total_finish_max}")
+    scatter_time = calc_start_min - total_start_min
+    calc_time = calc_finish_max - calc_start_min
+    gather_time = total_finish_max - calc_finish_max
+    total_time = total_finish_max - total_start_min
     #Must update this with whatever the max is in the bash file
     scatter_df = pd.read_pickle("scatter_df.pkl")
     calc_df = pd.read_pickle("calc_df.pkl")
@@ -76,20 +73,21 @@ if rank == 0:
     core_list = [2**j for j in range(int(np.log2(max_cores))+1)]
     if size == 1:
         #add a new line with a new val at the left
-        scatter_df = scatter_df.append( pd.DataFrame([[scatter_sum/size if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        calc_df = calc_df.append( pd.DataFrame([[calc_sum/size if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        gather_df = gather_df.append( pd.DataFrame([[gather_sum/size if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        total_df = total_df.append( pd.DataFrame([[total_sum/size if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        scatter_df = scatter_df.append( pd.DataFrame([[scatter_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        calc_df = calc_df.append( pd.DataFrame([[calc_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        gather_df = gather_df.append( pd.DataFrame([[gather_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        total_df = total_df.append( pd.DataFrame([[total_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
     elif size > 1:
         #add new value at right place
-        scatter_df.iloc[-1, str(size)] = (scatter_sum/size)
-        calc_df.iloc[-1, str(size)] = (calc_sum/size)
-        gather_df.iloc[-1, str(size)] = (gather_sum/size)
-        total_df.iloc[-1, str(size)] = (total_sum/size)
-    print(f"scatter: {scatter_sum/size}")
-    print("calc: {calc_sum/size}")
-    print(f"gather: {gather_sum/size}")
-    print(f"total: {total_sum/size}")
+        size_power = int(np.log2(size))
+        scatter_df.iloc[-1, size_power] = scatter_time
+        calc_df.iloc[-1, size_power] = calc_time
+        gather_df.iloc[-1, size_power] = gather_time
+        total_df.iloc[-1, size_power] = total_time
+    print(f"scatter: {scatter_time}")
+    print(f"calc: {calc_time}")
+    print(f"gather: {gather_time}")
+    print(f"total: {total_time}")
     scatter_df.to_pickle("scatter_df.pkl")
     calc_df.to_pickle("calc_df.pkl")
     gather_df.to_pickle("gather_df.pkl")
