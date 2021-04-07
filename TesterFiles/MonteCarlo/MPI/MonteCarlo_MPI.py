@@ -1,49 +1,40 @@
-from scipy.linalg import blas as FB
 from mpi4py import MPI
 import pandas as pd
 import numpy as np
-import time
+import random
 import sys
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-mat_power = int(sys.argv[1])
-mat_size = 2**mat_power
+attempts_power = int(sys.argv[1])
+attempts = 10**attempts_power
+
+def monte_carlo(attempts):
+    i = 0
+    hits = 0
+    for i in range(0,attempts):
+        x = random.uniform(0, 1)
+        y = random.uniform(0, 1)
+        if x**2 + y**2 <= 1:
+            hits += 1
+    return hits
 
 total_start = MPI.Wtime()
 
-# Initialize the 2 random matrices only if this is rank 0
-if rank == 0:
-    mat_A = np.random.rand(mat_size,mat_size).astype(np.float32)
-    mat_B = np.random.rand(mat_size,mat_size).astype(np.float32)
-    power = np.log2(size)/2
-    pars_i = int(2**(np.ceil(power)))
-    pars_j = int(2**(np.floor(power)))
-    send_list_A = np.split(mat_A, pars_i, axis=0)
-    send_list_B = np.split(mat_B, pars_j, axis=1)
-    send_list = []
-    for i in range(pars_i):
-        for j in range(pars_j):
-            send_list.append([send_list_A[i],send_list_B[j]])
-else:
-    mat_A = None
-    mat_B = None
-    send_list = None
-
-mats = comm.scatter(send_list,root=0)
+no_attempts = comm.bcast(attempts//size,root=0)
 
 calc_start = MPI.Wtime()
 
-mat_C = FB.sgemm(alpha=1.0, a=mats[0], b=mats[1])
+hits = monte_carlo(no_attempts)
 
 calc_finish = MPI.Wtime()
 
-res_list = comm.gather(mat_C,root=0)
-
+total_hits = comm.reduce(hits,op=MPI.SUM,root=0)
 if rank == 0:
-    res = np.vstack( np.split( np.concatenate(res_list,axis=1) , pars_i, axis=1) )
+    approx_pi = 4*total_hits/attempts
+    print(f"pi = {approx_pi}")
 
 total_finish = MPI.Wtime()
 
@@ -78,10 +69,10 @@ if rank == 0:
     core_list = [2**j for j in range(int(np.log2(max_cores))+1)]
     if size == 1:
         #add a new line with a new val at the left
-        scatter_df = scatter_df.append( pd.DataFrame([[scatter_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        calc_df = calc_df.append( pd.DataFrame([[calc_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        gather_df = gather_df.append( pd.DataFrame([[gather_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        total_df = total_df.append( pd.DataFrame([[total_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        scatter_df = scatter_df.append( pd.DataFrame([[scatter_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[attempts_power]) )
+        calc_df = calc_df.append( pd.DataFrame([[calc_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[attempts_power]) )
+        gather_df = gather_df.append( pd.DataFrame([[gather_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[attempts_power]) )
+        total_df = total_df.append( pd.DataFrame([[total_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[attempts_power]) )
     elif size > 1:
         #add new value at right place
         size_power = int(np.log2(size))
@@ -97,4 +88,3 @@ if rank == 0:
     calc_df.to_pickle("calc_df.pkl")
     gather_df.to_pickle("gather_df.pkl")
     total_df.to_pickle("total_df.pkl")
-
