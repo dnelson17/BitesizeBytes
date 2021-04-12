@@ -1,8 +1,9 @@
-from mpi4py import MPI
-import time
-import numpy as np
-import sys
 from scipy.linalg import blas as FB
+from mpi4py import MPI
+import pandas as pd
+import numpy as np
+import time
+import sys
 
 # mpiexec -n 4 python MatrixMult.py 4 1
 
@@ -18,8 +19,9 @@ amode_B = MPI.MODE_RDONLY
 amode_C = MPI.MODE_WRONLY|MPI.MODE_CREATE
 
 #Reads the Matrix Size from the command line
-mat_size = int(sys.argv[1])
+mat_power = int(sys.argv[1])
 iteration = int(sys.argv[2])
+mat_size = 2**mat_power
 
 #Assuming the number of processors is of size 2^n for int n, we take log2 to find the value of n
 power = np.log2(size)/2
@@ -53,9 +55,11 @@ fh_B.Close()
 
 calc_start = MPI.Wtime()
 
-buf_mat_C = np.ascontiguousarray(FB.sgemm(alpha=1.0, a=buf_mat_A, b=mat_B))
+mat_C = FB.sgemm(alpha=1.0, a=buf_mat_A, b=mat_B)
 
 calc_finish = MPI.Wtime()
+
+buf_mat_C = np.ascontiguousarray(mat_C)
 
 fh_C = MPI.File.Open(comm, f"mat_C/mat_C_{mat_size}_{iteration}.txt", amode_C)
 filetype = MPI.FLOAT.Create_vector(i_size, j_size, mat_size)
@@ -91,18 +95,18 @@ if rank == 0:
     total_time = io_finish_max - io_start_min
     assert np.isclose(read_time+calc_time+write_time,total_time)
     #Must update this with whatever the max is in the bash file
-    read_df = pd.read_pickle("read_df.pkl")
-    calc_df = pd.read_pickle("calc_df.pkl")
-    write_df = pd.read_pickle("write_df.pkl")
-    total_df = pd.read_pickle("total_df.pkl")
+    read_df = pd.read_pickle("time_dfs/read_df.pkl")
+    calc_df = pd.read_pickle("time_dfs/calc_df.pkl")
+    write_df = pd.read_pickle("time_dfs/write_df.pkl")
+    total_df = pd.read_pickle("time_dfs/total_df.pkl")
     max_cores = 32
     core_list = [2**j for j in range(int(np.log2(max_cores))+1)]
     if size == 1:
         #add a new line with a new val at the left
-        read_df = read_df.append( pd.DataFrame([[read_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        calc_df = calc_df.append( pd.DataFrame([[calc_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        write_df = write_df.append( pd.DataFrame([[write_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        total_df = total_df.append( pd.DataFrame([[total_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        read_df = read_df.append( pd.DataFrame([tuple([read_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
+        calc_df = calc_df.append( pd.DataFrame([tuple([calc_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
+        write_df = write_df.append( pd.DataFrame([tuple([write_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
+        total_df = total_df.append( pd.DataFrame([tuple([total_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
     elif size > 1:
         #add new value at right place
         size_power = int(np.log2(size))
@@ -114,7 +118,7 @@ if rank == 0:
     print(f"calc: {calc_time}")
     print(f"write: {write_time}")
     print(f"total: {total_time}")
-    scatter_df.to_pickle("read_df.pkl")
-    calc_df.to_pickle("calc_df.pkl")
-    gather_df.to_pickle("write_df.pkl")
-    total_df.to_pickle("total_df.pkl")
+    read_df.to_pickle("time_dfs/read_df.pkl")
+    calc_df.to_pickle("time_dfs/calc_df.pkl")
+    write_df.to_pickle("time_dfs/write_df.pkl")
+    total_df.to_pickle("time_dfs/total_df.pkl")

@@ -8,6 +8,7 @@ pkl_list = ["calc","total"]
 for pkl_name in pkl_list:
     print(pkl_name)
     time_df = pd.read_pickle(f"TimeResults/{pkl_name}_time_df_lapack.pkl")
+    print(time_df.to_string())
     time_df = time_df.sort_index()
     time_df = time_df.groupby(time_df.index).mean()
     print(time_df.to_string())

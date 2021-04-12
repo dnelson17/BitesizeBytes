@@ -7,8 +7,9 @@ import sys
 comm = MPI.COMM_WORLD
 
 # Will use this when testing such that it can be looped efficiently
-mat_size = int(sys.argv[1])
+mat_power = int(sys.argv[1])
 iteration = int(sys.argv[2])
+mat_size = 2**mat_power
 
 mat_A = np.random.rand(mat_size,mat_size).astype(np.float32)
 #print("mat A")
