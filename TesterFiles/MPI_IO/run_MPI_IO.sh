@@ -2,7 +2,7 @@
 
 python Gen_empty_dfs.py
 
-for mat_size in 10 11 12 13 14 15 16; do
+for mat_size in 10 11 12 13 14 15; do
 	echo "mat: 2^$mat_size"
 	echo ""
 	for i in 1 2 3 4 5 6 7 8 9 10; do

@@ -15,8 +15,8 @@ for pkl_name in pkl_list:
     speedup_df = time_df.apply(lambda x: x.iloc[0]/x, axis=1, result_type='expand')
     ideal_df = pd.DataFrame([core_list],columns=core_list,index=["Ideal"])
     speedup_df = speedup_df.append( ideal_df )
+    print(speedup_df.to_string())
     speedup_df = speedup_df.T
-    print(speedup_df)
     speedup_df.plot()
     plt.xlabel("Number of Cores")
     plt.ylabel("Runtime Speedup")

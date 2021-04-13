@@ -103,10 +103,10 @@ if rank == 0:
     core_list = [2**j for j in range(int(np.log2(max_cores))+1)]
     if size == 1:
         #add a new line with a new val at the left
-        read_df = read_df.append( pd.DataFrame([tuple([read_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
-        calc_df = calc_df.append( pd.DataFrame([tuple([calc_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
-        write_df = write_df.append( pd.DataFrame([tuple([write_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
-        total_df = total_df.append( pd.DataFrame([tuple([total_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
+        read_df = read_df.append( pd.DataFrame([tuple([read_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
+        calc_df = calc_df.append( pd.DataFrame([tuple([calc_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
+        write_df = write_df.append( pd.DataFrame([tuple([write_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
+        total_df = total_df.append( pd.DataFrame([tuple([total_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
     elif size > 1:
         #add new value at right place
         size_power = int(np.log2(size))

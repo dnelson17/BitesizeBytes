@@ -10,6 +10,7 @@ for pkl_name in pkl_list:
     time_df = pd.read_pickle(f"TimeResults/{pkl_name}_time_df_myfunc.pkl")
     time_df = time_df.sort_index()
     time_df = time_df.groupby(time_df.index).mean()
+    print(time_df.info())
     print(time_df.to_string())
     speedup_df = time_df.apply(lambda x: x.iloc[0]/x, axis=1, result_type='expand')
     ideal_df = pd.DataFrame([core_list],columns=core_list,index=["Ideal"])
