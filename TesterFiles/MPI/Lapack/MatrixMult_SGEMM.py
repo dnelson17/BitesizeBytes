@@ -78,10 +78,10 @@ if rank == 0:
     core_list = [2**j for j in range(int(np.log2(max_cores))+1)]
     if size == 1:
         #add a new line with a new val at the left
-        scatter_df = scatter_df.append( pd.DataFrame([[scatter_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        calc_df = calc_df.append( pd.DataFrame([[calc_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        gather_df = gather_df.append( pd.DataFrame([[gather_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        total_df = total_df.append( pd.DataFrame([[total_time if i==0 else 0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        scatter_df = scatter_df.append( pd.DataFrame([[scatter_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        calc_df = calc_df.append( pd.DataFrame([[calc_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        gather_df = gather_df.append( pd.DataFrame([[gather_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        total_df = total_df.append( pd.DataFrame([[total_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
     elif size > 1:
         #add new value at right place
         size_power = int(np.log2(size))
