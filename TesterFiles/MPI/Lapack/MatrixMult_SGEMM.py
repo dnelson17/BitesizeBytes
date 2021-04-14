@@ -12,12 +12,14 @@ size = comm.Get_size()
 mat_power = int(sys.argv[1])
 mat_size = 2**mat_power
 
-total_start = MPI.Wtime()
-
 # Initialize the 2 random matrices only if this is rank 0
 if rank == 0:
     mat_A = np.random.rand(mat_size,mat_size).astype(np.float32)
     mat_B = np.random.rand(mat_size,mat_size).astype(np.float32)
+
+total_start = MPI.Wtime()
+
+if rank == 0:
     power = np.log2(size)/2
     pars_i = int(2**(np.ceil(power)))
     pars_j = int(2**(np.floor(power)))
@@ -70,10 +72,10 @@ if rank == 0:
     total_time = total_finish_max - total_start_min
     assert np.isclose(scatter_time+calc_time+gather_time,total_time)
     #Must update this with whatever the max is in the bash file
-    scatter_df = pd.read_pickle("scatter_df.pkl")
-    calc_df = pd.read_pickle("calc_df.pkl")
-    gather_df = pd.read_pickle("gather_df.pkl")
-    total_df = pd.read_pickle("total_df.pkl")
+    scatter_df = pd.read_pickle("Time_dfs/scatter_df.pkl")
+    calc_df = pd.read_pickle("Time_dfs/calc_df.pkl")
+    gather_df = pd.read_pickle("Time_dfs/gather_df.pkl")
+    total_df = pd.read_pickle("Time_dfs/total_df.pkl")
     max_cores = 32
     core_list = [2**j for j in range(int(np.log2(max_cores))+1)]
     if size == 1:
@@ -93,8 +95,8 @@ if rank == 0:
     print(f"calc: {calc_time}")
     print(f"gather: {gather_time}")
     print(f"total: {total_time}")
-    scatter_df.to_pickle("scatter_df.pkl")
-    calc_df.to_pickle("calc_df.pkl")
-    gather_df.to_pickle("gather_df.pkl")
-    total_df.to_pickle("total_df.pkl")
+    scatter_df.to_pickle("Time_dfs/scatter_df.pkl")
+    calc_df.to_pickle("Time_dfs/calc_df.pkl")
+    gather_df.to_pickle("Time_dfs/gather_df.pkl")
+    total_df.to_pickle("Time_dfs/total_df.pkl")
 
