@@ -63,9 +63,9 @@ def gen_time_results(mat_size, no_cores, data_A, data_B):
 
 
 def main():
-    size_list = [2**i for i in range(5,10)]
+    size_list = [2**i for i in range(5,12)]
     no_runs = 10
-    time_df = pd.DataFrame(columns=["My function","My function (32 Cores)","Numpy MatMul","Lapack dgemm","Lapack sgemm"])
+    time_df = pd.DataFrame(columns=["My_function","My_function_(32_Cores)","Numpy_MatMul","Lapack_dgemm","Lapack_sgemm"])
     for mat_size in size_list:
         print(f"Mat size: {mat_size}")
         for _ in range(no_runs):
@@ -98,8 +98,10 @@ def main():
             ms = FB.sgemm(alpha=1, a=m1, b=m2)
             sgemm_finish = time.perf_counter()
             new_times.append(round(sgemm_finish-sgemm_start,8))
+
+            print(new_times)
             
-            time_df = time_df.append( pd.DataFrame([new_times],columns=["My function","My function (32 Cores)","Numpy MatMul","Lapack dgemm","Lapack sgemm"],index=[mat_size]) )
+            time_df = time_df.append( pd.DataFrame([new_times],columns=["My_function","My_function_(32_Cores)","Numpy_MatMul","Lapack_dgemm","Lapack_sgemm"],index=[mat_size]) )
             time_df.to_pickle("time_df_libraries.pkl")
     print(f"\nOriginal times:\n{time_df}")
     time_df = time_df.sort_index()

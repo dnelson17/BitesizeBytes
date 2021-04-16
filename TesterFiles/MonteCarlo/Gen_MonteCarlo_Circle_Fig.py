@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+from pathlib import Path
 import numpy as np
 
 def monte_carlo(attempts):
@@ -29,4 +30,6 @@ plt.plot(np.cos(t), np.sin(t), linewidth=5)
 
 plt.gca().set_aspect('equal')
 
-plt.savefig("C:\\University\\Project\\BitesizeBytes\\TesterFiles\\Figures\\MonteCarlo_Pi.png", dpi=1000)
+p = Path.cwd()
+
+plt.savefig(f"{p.parent.parent}\Figures\MonteCarlo_Pi.png")
