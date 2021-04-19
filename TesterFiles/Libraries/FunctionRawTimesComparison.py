@@ -63,41 +63,59 @@ def gen_time_results(mat_size, no_cores, data_A, data_B):
 
 
 def main():
-    size_list = [2**i for i in range(5,12)]
+    size_list = [2**i for i in range(5,14)]
     no_runs = 10
     time_df = pd.DataFrame(columns=["My_function","My_function_(32_Cores)","Numpy_MatMul","Lapack_dgemm","Lapack_sgemm"])
     for mat_size in size_list:
         print(f"Mat size: {mat_size}")
-        for _ in range(no_runs):
+        for i in range(no_runs):
+            print(f"i: {i}")
+
             total_time_Numpy = 0
-            m1 = np.random.rand(mat_size,mat_size)
-            m2 = np.random.rand(mat_size,mat_size)
+            m1 = np.random.rand(mat_size,mat_size).astype(np.float32)
+            m2 = np.random.rand(mat_size,mat_size).astype(np.float32)
             new_times=[]
+
+            time.sleep(10)
             
-            my_func_start = time.perf_counter()
-            m_myfunc = matrix_mult(m1,m2)
-            my_func_finish = time.perf_counter()
-            new_times.append(round(my_func_finish-my_func_start,8))
-            
-            my_func_32cores_start = time.perf_counter()
-            time_taken, m_myfunc32 = gen_time_results(mat_size,32,m1,m2)
-            my_func_32cores_finish = time.perf_counter()
-            new_times.append(round(my_func_32cores_finish-my_func_32cores_start,8))
+            if mat_size < 1024:
+                my_func_start = time.perf_counter()
+                m_myfunc = matrix_mult(m1,m2)
+                my_func_finish = time.perf_counter()
+                new_times.append(round(my_func_finish-my_func_start,8))
+
+                time.sleep(5)
+                
+                my_func_32cores_start = time.perf_counter()
+                time_taken, m_myfunc32 = gen_time_results(mat_size,32,m1,m2)
+                my_func_32cores_finish = time.perf_counter()
+                new_times.append(round(my_func_32cores_finish-my_func_32cores_start,8))
+
+                time.sleep(5)
+            else:
+                new_times.append(None)
+                new_times.append(None)
             
             numpy_start = time.perf_counter()
             mn = np.matmul(m1,m2)
             numpy_finish = time.perf_counter()
             new_times.append(round(numpy_finish-numpy_start,8))
+
+            time.sleep(5)
             
             dgemm_start = time.perf_counter()
             md = FB.dgemm(alpha=1, a=m1, b=m2)
             dgemm_finish = time.perf_counter()
             new_times.append(round(dgemm_finish-dgemm_start,8))
+
+            time.sleep(5)
             
             sgemm_start = time.perf_counter()
             ms = FB.sgemm(alpha=1, a=m1, b=m2)
             sgemm_finish = time.perf_counter()
             new_times.append(round(sgemm_finish-sgemm_start,8))
+
+            time.sleep(5)
 
             print(new_times)
             
@@ -107,7 +125,6 @@ def main():
     time_df = time_df.sort_index()
     time_df = time_df.groupby(time_df.index).mean()
     print(f"\nTimes after ordering and mean:\n{time_df}")
-    time_df.to_pickle("time_df_libraries.pkl")
 
 
 if __name__ == '__main__':
