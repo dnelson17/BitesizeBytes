@@ -78,7 +78,7 @@ def main():
 
             time.sleep(10)
             
-            if mat_size < 1024:
+            if mat_size < 256:
                 my_func_start = time.perf_counter()
                 m_myfunc = matrix_mult(m1,m2)
                 my_func_finish = time.perf_counter()
