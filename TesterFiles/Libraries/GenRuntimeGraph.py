@@ -22,7 +22,7 @@ def read_fortran_times(p):
 def gen_cubed_df(start_power,end_power):
     order_list = [2**j for j in range(start_power,end_power)]
     cubed_list = [(2**j)**3 for j in range(start_power,end_power)]
-    cubed_df = pd.DataFrame([cubed_list],columns=order_list,index=["(n^3)/100"])
+    cubed_df = pd.DataFrame([cubed_list],columns=order_list,index=["n^3"])
     return cubed_df.T
 
 
@@ -34,7 +34,7 @@ def apply_norm(time_df,norm_index):
 def gen_plot(df,p):
     df = df.T
     df.plot()
-    plt.xlabel("Matrix Order")
+    plt.xlabel("Matrix Order (n)")
     plt.ylabel("Normalised Runtime")
     plt.legend()
     #plt.gca().set_aspect('equal')
