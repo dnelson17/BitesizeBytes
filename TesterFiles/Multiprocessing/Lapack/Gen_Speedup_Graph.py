@@ -23,4 +23,4 @@ for pkl_name in pkl_list:
     plt.ylabel("Runtime Speedup")
     plt.legend()
     #plt.show()
-    plt.savefig(f"{p.parent.parent}\Figures\multiprocessing_{pkl_name}_speedup_lapack.png")
+    plt.savefig(f"{p.parent.parent.parent}\Figures\Multiprocessing\multiprocessing_{pkl_name}_speedup_lapack.png")

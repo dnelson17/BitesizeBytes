@@ -22,4 +22,4 @@ for pkl_name in pkl_list:
     plt.ylabel("Runtime Speedup")
     plt.legend()
     #plt.savefig(f"C:\\University\\Project\\BitesizeBytes\\TesterFiles\\Figures\\MPI_lapack_{pkl_name[:-7]}_speedup.jpeg", dpi=1000)
-    plt.savefig(f"{p.parent.parent}\Figures\MPI_lapack_{pkl_name}_speedup.png")
+    plt.savefig(f"{p.parent.parent.parent}\Figures\MPI\MPI_lapack_{pkl_name}_speedup.png")

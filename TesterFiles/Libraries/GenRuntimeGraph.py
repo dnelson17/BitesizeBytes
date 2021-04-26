@@ -40,7 +40,7 @@ def gen_plot(df,p):
     #plt.gca().set_aspect('equal')
     p = Path.cwd()
     #plt.show()
-    plt.savefig(f"{p.parent.parent}\Figures\Library_Normalised_Runtimes.png")
+    plt.savefig(f"{p.parent.parent}\Figures\Libraries\Library_Normalised_Runtimes.png")
 
 
 def main():

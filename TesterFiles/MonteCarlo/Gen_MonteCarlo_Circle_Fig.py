@@ -32,4 +32,4 @@ plt.gca().set_aspect('equal')
 
 p = Path.cwd()
 
-plt.savefig(f"{p.parent.parent}\Figures\MonteCarlo_Pi.png")
+plt.savefig(f"{p.parent.parent}\Figures\MonteCarlo\MonteCarlo_Pi.png")
