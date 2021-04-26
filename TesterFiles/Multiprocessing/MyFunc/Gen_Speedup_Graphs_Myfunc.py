@@ -1,9 +1,10 @@
 from matplotlib import pyplot as plt
+from pathlib import Path
 import pandas as pd
 
 core_list = [2**j for j in range(6)]
-
 pkl_list = ["calc","total"]
+p = Path.cwd()
 
 for pkl_name in pkl_list:
     print(pkl_name)
@@ -22,4 +23,4 @@ for pkl_name in pkl_list:
     plt.ylabel("Runtime Speedup")
     plt.legend()
     #plt.show()
-    plt.savefig(f"multiprocessing_{pkl_name}_speedup_myfunc.png", dpi=1000)
+    plt.savefig(f"{p.parent.parent}\Figures\multiprocessing_{pkl_name}_speedup_myfunc.png"

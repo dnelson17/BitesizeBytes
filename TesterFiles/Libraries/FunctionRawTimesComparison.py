@@ -71,7 +71,6 @@ def main():
         for i in range(no_runs):
             print(f"i: {i}")
 
-            total_time_Numpy = 0
             m1 = np.random.rand(mat_size,mat_size).astype(np.float32)
             m2 = np.random.rand(mat_size,mat_size).astype(np.float32)
             new_times=[]

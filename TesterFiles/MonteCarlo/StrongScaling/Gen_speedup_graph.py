@@ -1,5 +1,8 @@
 from matplotlib import pyplot as plt
+from pathlib import Path
 import pandas as pd
+
+p = Path.cwd()
 
 speedup_df = pd.read_pickle("speedup_df_strong_scaling.pkl")
 speedup_df = speedup_df.T
@@ -8,4 +11,4 @@ speedup_df.plot()
 plt.xlabel("Number of Cores")
 plt.ylabel("Runtime Speedup")
 plt.legend()
-plt.savefig("montecarlo_speedup_strong_scaling.png", dpi=1000)
+plt.savefig(f"{p.parent.parent}\Figures\montecarlo_speedup_strong_scaling.png")

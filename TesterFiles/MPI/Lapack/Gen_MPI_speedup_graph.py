@@ -1,8 +1,10 @@
 from matplotlib import pyplot as plt
+from pathlib import Path
 import pandas as pd
 
 pkl_list = ["scatter", "calc", "gather", "total"]
 core_list = [2**i for i in range(6)]
+p = Path.cwd()
 
 for pkl_name in pkl_list:
     print(f"\n\n{pkl_name}")
@@ -20,4 +22,4 @@ for pkl_name in pkl_list:
     plt.ylabel("Runtime Speedup")
     plt.legend()
     #plt.savefig(f"C:\\University\\Project\\BitesizeBytes\\TesterFiles\\Figures\\MPI_lapack_{pkl_name[:-7]}_speedup.jpeg", dpi=1000)
-    plt.savefig(f"MPI_lapack_{pkl_name}_speedup.png")
+    plt.savefig(f"{p.parent.parent}\Figures\MPI_lapack_{pkl_name}_speedup.png")

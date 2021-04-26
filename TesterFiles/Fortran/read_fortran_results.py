@@ -5,6 +5,8 @@ def read_fortran_times():
     fortran_df = pd.read_fwf("fortran_results.txt")
     fortran_df.columns = ["NumProcs","MatSize","Times"]
     fortran_df = fortran_df.pivot(index="MatSize",columns="NumProcs",values="Times")
+    fortran_df = fortran_df.drop([2,4,8,16,32],axis=1)
+    fortran_df.columns = ["Fortran"]
     return fortran_df
 
 
@@ -38,10 +40,8 @@ def main():
     cubed_df = gen_cubed_df(start_power,end_power)
     total_df = fortran_df.join(cubed_df)
     norm_df = apply_norm(total_df,norm_index)
-    norm_df = norm_df.drop([2,4,8,16,32],axis=0)
     print(norm_df)
     gen_plot(norm_df)
-    
 
 
 if __name__ == '__main__':

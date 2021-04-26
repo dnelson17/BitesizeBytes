@@ -1,7 +1,10 @@
 from matplotlib import pyplot as plt
+from pathlib import Path
 import pandas as pd
 
-pkl_list = ["scatter_df.pkl", "calc_df.pkl", "gather_df.pkl", "total_df.pkl"]
+pkl_list = ["read", "calc", "write", "total"]
+core_list = [2**i for i in range(6)]
+p = Path.cwd()
 
 for pkl_name in pkl_list:
     time_df = pd.read_pickle(pkl_name)
@@ -15,4 +18,4 @@ for pkl_name in pkl_list:
     plt.xlabel("Number of Cores")
     plt.ylabel("Runtime Speedup")
     plt.legend()
-    plt.savefig(f"MPI_myfunc_{pkl_name[:-7]}_speedup.png", dpi=1000)
+    plt.savefig(f"{p.parent.parent}\Figures\MPI_myfunc_{pkl_name}_speedup.png")
