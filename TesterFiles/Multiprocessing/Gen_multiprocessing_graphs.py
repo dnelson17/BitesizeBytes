@@ -58,8 +58,6 @@ def main():
         for norm_pkl_name in norm_pkl_list:
             print(f"\n\n{norm_pkl_name}")
             time_df = read_df_pickle(f"{func_name}/Time_dfs/{norm_pkl_name}_df.pkl")
-            if func_name == "Lapack":
-                time_df = time_df.drop([256])
             print(f"time df: \n{time_df}")
             norm_df = apply_norm(time_df,0,core_list)
             print(f"norm df: \n{norm_df}")

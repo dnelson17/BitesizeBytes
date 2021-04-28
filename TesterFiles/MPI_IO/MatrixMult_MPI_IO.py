@@ -95,10 +95,10 @@ if rank == 0:
     total_time = io_finish_max - io_start_min
     assert np.isclose(read_time+calc_time+write_time,total_time)
     #Must update this with whatever the max is in the bash file
-    read_df = pd.read_pickle("time_dfs/read_df.pkl")
-    calc_df = pd.read_pickle("time_dfs/calc_df.pkl")
-    write_df = pd.read_pickle("time_dfs/write_df.pkl")
-    total_df = pd.read_pickle("time_dfs/total_df.pkl")
+    read_df = pd.read_pickle("Time_dfs/read_df.pkl")
+    calc_df = pd.read_pickle("Time_dfs/calc_df.pkl")
+    write_df = pd.read_pickle("Time_dfs/write_df.pkl")
+    total_df = pd.read_pickle("Time_dfs/total_df.pkl")
     max_cores = 32
     core_list = [2**j for j in range(int(np.log2(max_cores))+1)]
     if size == 1:
@@ -118,7 +118,7 @@ if rank == 0:
     print(f"calc: {calc_time}")
     print(f"write: {write_time}")
     print(f"total: {total_time}")
-    read_df.to_pickle("time_dfs/read_df.pkl")
-    calc_df.to_pickle("time_dfs/calc_df.pkl")
-    write_df.to_pickle("time_dfs/write_df.pkl")
-    total_df.to_pickle("time_dfs/total_df.pkl")
+    read_df.to_pickle("Time_dfs/read_df.pkl")
+    calc_df.to_pickle("Time_dfs/calc_df.pkl")
+    write_df.to_pickle("Time_dfs/write_df.pkl")
+    total_df.to_pickle("Time_dfs/total_df.pkl")
