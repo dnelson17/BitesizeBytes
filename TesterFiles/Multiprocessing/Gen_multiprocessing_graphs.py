@@ -26,7 +26,7 @@ def apply_speedup(time_df,core_list):
 def gen_plot(df,p,speedup,pkl_name,func_name):
     df = df.T
     df.plot()
-    plt.xlabel("Matrix Order (n)")
+    plt.xlabel("Number of processors (p)")
     if speedup:
         plt.ylabel("Runtime Speedup")
     else:
