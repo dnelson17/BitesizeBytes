@@ -39,7 +39,6 @@ for func_name in func_list:
     mean = sum(range(6))/len(range(6))
     for i in range(max_cores):
         bar_l = [j-1+1.5*bar_width*(i-mean) for j in range(len(total_df.index))]
-        print(bar_l)
         norm_scatter_sub_df = norm_scatter_df[[2**i]].T.values[0]
         norm_calc_sub_df = norm_calc_df[[2**i]].T.values[0]
         norm_gather_sub_df = norm_gather_df[[2**i]].T.values[0]
@@ -71,7 +70,5 @@ for func_name in func_list:
     plt.xlabel("Matrix order")
     plt.ylabel("Normalised Runtime")
     plt.legend(["Scatter","Calc","Gather"])
-    #plt.xlim([min(bar_l)-bar_width, max(bar_l)+bar_width])
-    #plt.savefig(f"{p.parent.parent}\Figures\Multiprocessing\Multiprocessing_{func_name}_barchart.png")
-    plt.show()
+    plt.savefig(f"{p.parent.parent}\Figures\Multiprocessing\Multiprocessing_{func_name}_barchart_all_cores.png")
     plt.clf()
