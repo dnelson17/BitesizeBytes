@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 import pandas as pd
 
 def read_fortran_times():
-    fortran_df = pd.read_fwf("fortran_results.txt")
+    fortran_df = pd.read_fwf("fortran_results_lock.txt")
     fortran_df.columns = ["NumProcs","MatSize","Times"]
     fortran_df = fortran_df.pivot(index="MatSize",columns="NumProcs",values="Times")
     return fortran_df
