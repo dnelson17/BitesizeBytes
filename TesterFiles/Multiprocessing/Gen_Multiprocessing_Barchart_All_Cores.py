@@ -53,7 +53,7 @@ for func_name in func_list:
         calc_plt =  plt.bar(bar_l,
                             norm_calc_sub_df,
                             width=bar_width,
-                            label="Calc",
+                            label="Calculation",
                             alpha=0.5,
                             bottom=norm_scatter_sub_df,
                             color="g")
@@ -67,8 +67,8 @@ for func_name in func_list:
                             color="r")
 
     plt.xticks([j-1 for j in range(len(total_df.index))], calc_df.index)
-    plt.xlabel("Matrix order")
+    plt.xlabel("Matrix order (N)")
     plt.ylabel("Normalised Runtime")
-    plt.legend(["Scatter","Calc","Gather"])
+    plt.legend(["Scatter","Calculation","Gather"])
     plt.savefig(f"{p.parent.parent}\Figures\Multiprocessing\Multiprocessing_{func_name}_barchart_all_cores.png")
     plt.clf()

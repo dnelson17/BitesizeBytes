@@ -30,7 +30,7 @@ def read_myfunc_times(path_name):
 def gen_cubed_df(start_power,end_power):
     order_list = [2**j for j in range(start_power,end_power)]
     cubed_list = [(2**j)**3 for j in range(start_power,end_power)]
-    cubed_df = pd.DataFrame([cubed_list],columns=order_list,index=["n^3"])
+    cubed_df = pd.DataFrame([cubed_list],columns=order_list,index=["N^3"])
     return cubed_df.T
 
 
@@ -41,14 +41,15 @@ def apply_norm(time_df,norm_index):
 
 def gen_plot(df,p,lock_val):
     df = df.T
+    df.columns = ["matmul (NumPy Python)","dgemm (Python)","sgemm (Python)","sgemm (Fortran)","N^3"]
     df.plot()
     plt.xlabel("Matrix Order (N)")
     plt.ylabel("Normalised Runtime (T)")
     plt.legend()
     #plt.gca().set_aspect('equal')
     p = Path.cwd()
-    plt.show()
-    #plt.savefig(f"{p.parent.parent}\Figures\Libraries\Library_Normalised_Runtimes_{lock_val}.png")
+    #plt.show()
+    plt.savefig(f"{p.parent.parent}\Figures\Libraries\Library_Normalised_Runtimes_{lock_val}.png")
 
 
 def calc_FLOPS(df):
@@ -80,25 +81,25 @@ def main():
     for lock_val in ["no_lock","lock"]:
         print(f"\n\n{lock_val}\n")
         python_df = read_python_times(f"time_df_libraries_{lock_val}.pkl")
-        print(f"python_df: \n{python_df}")
+        #print(f"python_df: \n{python_df}")
         
-        fortran_df = read_fortran_times(f"{p.parent}\Fortran/fortran_results_{lock_val}.txt")
-        print(f"fortran_df: \n{fortran_df}")
+        fortran_df = read_fortran_times(f"{p.parent}\Fortran/fortran_results.txt")
+        #print(f"fortran_df: \n{fortran_df}")
         python_and_fortran_df = python_df.join(fortran_df)
         
         cubed_df = gen_cubed_df(start_power,end_power)
-        print(f"cubed_df: \n{cubed_df}")
+        #print(f"cubed_df: \n{cubed_df}")
         
         total_df = python_and_fortran_df.join(cubed_df)
-        print(f"total_df: \n{total_df}")
+        #print(f"total_df: \n{total_df}")
         norm_df = apply_norm(total_df,norm_index)
-        print(f"norm_df: \n{norm_df.to_string()}")
+        #print(f"norm_df: \n{norm_df.to_string()}")
     
         gen_plot(norm_df,p,lock_val)
-    myfunc_df = read_myfunc_times(f"time_df_my_function_{lock_val}.pkl")
-    python_and_fortran_df = myfunc_df.join(python_and_fortran_df)
-    print_overleaf_table(python_and_fortran_df)
-    print(calc_FLOPS(python_and_fortran_df).to_string())
+        myfunc_df = read_myfunc_times(f"time_df_my_function_{lock_val}.pkl")
+        python_and_fortran_df = myfunc_df.join(python_and_fortran_df)
+        print_overleaf_table(python_and_fortran_df)
+    #print(calc_FLOPS(python_and_fortran_df).to_string())
 
 
 if __name__ == '__main__':

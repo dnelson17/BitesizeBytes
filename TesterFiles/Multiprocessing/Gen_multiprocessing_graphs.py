@@ -26,17 +26,18 @@ def apply_speedup(time_df,core_list):
 def gen_plot(df,p,speedup,pkl_name,func_name):
     df = df.T
     df.plot()
-    plt.xlabel("Number of processors (p)")
+    plt.xlabel("Number of processors (P)")
     if speedup:
-        plt.ylabel("Runtime Speedup")
+        plt.ylabel("Runtime Speedup (S)")
     else:
         plt.ylabel("Normalised Runtime")
-    plt.legend()
+    plt.legend([f"N={n}" if n != "Ideal" else "Ideal" for n in df.columns])
     p = Path.cwd()
-    if speedup:
-        plt.savefig(f"{p.parent.parent}\Figures\Multiprocessing\multiprocessing_{func_name}_{pkl_name}_speedup.png")
-    else:
-        plt.savefig(f"{p.parent.parent}\Figures\Multiprocessing\multiprocessing_{func_name}_{pkl_name}_norm.png")
+    plt.show()
+    #if speedup:
+    #    plt.savefig(f"{p.parent.parent}\Figures\Multiprocessing\multiprocessing_{func_name}_{pkl_name}_speedup.png")
+    #else:
+    #    plt.savefig(f"{p.parent.parent}\Figures\Multiprocessing\multiprocessing_{func_name}_{pkl_name}_norm.png")
 
 
 def main():
