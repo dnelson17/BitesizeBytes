@@ -26,7 +26,7 @@ program parallel_matrix
     call MPI_comm_size(mpi_comm_world, ncpus, ierr)
     call MPI_comm_rank(mpi_comm_world, myrank, ierr)
 
-    do jj=10,15
+    do jj=8,15
         m_size = 2**jj
 
         numrows = m_size/ncpus
@@ -44,7 +44,7 @@ program parallel_matrix
         end_time   = hel_time()
 
         if (myrank==0) then
-            print *, m_size, (end_time - start_time)/niter
+            print *, ncpus, m_size, (end_time - start_time)/niter
         end if
 
         call tear_down_matrix

@@ -18,7 +18,7 @@ def apply_speedup(time_df,core_list):
 def gen_plot(df):
     df = df.T
     df.plot()
-    plt.xlabel("Matrix Order")
+    plt.xlabel("Number of Processors")
     plt.ylabel("Runtime Speedup")
     plt.legend()
     plt.show()
