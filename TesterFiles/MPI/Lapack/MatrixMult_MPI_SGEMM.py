@@ -16,29 +16,32 @@ mat_size = 2**mat_power
 if rank == 0:
     mat_A = np.random.rand(mat_size,mat_size).astype(np.float32)
     mat_B = np.random.rand(mat_size,mat_size).astype(np.float32)
-
-total_start = MPI.Wtime()
-
-if rank == 0:
-    power = np.log2(size)/2
-    pars_i = int(2**(np.ceil(power)))
-    pars_j = int(2**(np.floor(power)))
-    send_list_A = np.split(mat_A, pars_i, axis=0)
-    send_list_B = np.split(mat_B, pars_j, axis=1)
-    send_list = []
-    for i in range(pars_i):
-        for j in range(pars_j):
-            send_list.append([send_list_A[i],send_list_B[j]])
+    trans_mat_B = np.transpose(mat_B)
+    trans_mat_B = np.ascontiguousarray(trans_mat_B, dtype=np.float32)
 else:
     mat_A = None
-    mat_B = None
-    send_list = None
+    trans_mat_B = None
 
-mats = comm.scatter(send_list,root=0)
+comm.Barrier()
+total_start = MPI.Wtime()
+
+power = np.log2(size)/2
+pars_i = int(2**(np.ceil(power)))
+pars_j = int(2**(np.floor(power)))
+len_i = int(mat_size/pars_i)
+len_j = int(mat_size/pars_j)
+factor = 2**(int(np.log2(size))%2)
+count_A = [len_i*mat_size for _ in range(size)]
+count_B = [len_j*mat_size for _ in range(size)]
+displ_A = [len_i*mat_size * (factor * list_rank // pars_i) for list_rank in range(size)]
+displ_B = [len_j*mat_size * (list_rank % pars_j) for list_rank in range(size)]
+
+comm.Scatterv([mat_A,count_A,displ_A,MPI.FLOAT],sub_mat_A,root=0)
+comm.Scatterv([trans_mat_B,count_B,displ_B,MPI.FLOAT],sub_mat_B,root=0)
 
 calc_start = MPI.Wtime()
 
-mat_C = FB.sgemm(alpha=1.0, a=mats[0], b=mats[1])
+sub_mat_C = FB.sgemm(alpha=1.0, a=sub_mat_A, b=sub_mat_B, trans_b=True)
 
 calc_finish = MPI.Wtime()
 
