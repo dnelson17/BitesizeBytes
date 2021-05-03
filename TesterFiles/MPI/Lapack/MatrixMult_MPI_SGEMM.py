@@ -36,6 +36,9 @@ count_B = [len_j*mat_size for _ in range(size)]
 displ_A = [len_i*mat_size * (factor * list_rank // pars_i) for list_rank in range(size)]
 displ_B = [len_j*mat_size * (list_rank % pars_j) for list_rank in range(size)]
 
+sub_mat_A = np.zeros((len_i,mat_size),dtype=np.float32)
+sub_mat_B = np.zeros((len_j,mat_size),dtype=np.float32)
+
 comm.Scatterv([mat_A,count_A,displ_A,MPI.FLOAT],sub_mat_A,root=0)
 comm.Scatterv([trans_mat_B,count_B,displ_B,MPI.FLOAT],sub_mat_B,root=0)
 
@@ -45,10 +48,20 @@ sub_mat_C = FB.sgemm(alpha=1.0, a=sub_mat_A, b=sub_mat_B, trans_b=True)
 
 calc_finish = MPI.Wtime()
 
-res_list = comm.gather(mat_C,root=0)
+if rank == 0:
+    mat_C = np.zeros(mat_size*mat_size,dtype=np.float32)
+else:
+    mat_C = np.zeros(0,dtype=np.float32)
+
+count_C = [len_i*len_j for _ in range(size)]
+displ_C = [len_i*len_j*list_rank for list_rank in range(size)]
+sub_mat_C = np.ascontiguousarray(sub_mat_C, dtype=np.float32)
+comm.Gatherv(sub_mat_C,[mat_C,count_C,displ_C,MPI.FLOAT],root=0)
 
 if rank == 0:
-    res = np.vstack( np.split( np.concatenate(res_list,axis=1) , pars_i, axis=1) )
+    mat_C = np.split(mat_C, size, axis=0)
+    mat_C = np.apply_along_axis(func1d=np.reshape, axis=1, arr=mat_C, newshape=(len_i,len_j) )
+    mat_C = np.vstack( np.split( np.concatenate(mat_C,axis=1) , pars_i, axis=1) )
 
 total_finish = MPI.Wtime()
 

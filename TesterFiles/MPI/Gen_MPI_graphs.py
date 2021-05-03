@@ -48,6 +48,7 @@ def main():
     norm_pkl_list = ["scatter", "gather"]
     norm_index = 0
     for func_name in func_list:
+        print(f"\n{func_name}")
         for speedup_pkl_name in speedup_pkl_list:
             print(f"\n\n{speedup_pkl_name}")
             time_df = read_df_pickle(f"{func_name}/Time_dfs/{speedup_pkl_name}_df.pkl")
