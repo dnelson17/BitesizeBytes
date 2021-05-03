@@ -36,8 +36,8 @@ count_B = [len_j*mat_size for _ in range(size)]
 displ_A = [len_i*mat_size * (factor * list_rank // pars_i) for list_rank in range(size)]
 displ_B = [len_j*mat_size * (list_rank % pars_j) for list_rank in range(size)]
 
-sub_mat_A = np.zeros((len_i,mat_size),dtype=np.float32)
-sub_mat_B = np.zeros((len_j,mat_size),dtype=np.float32)
+sub_mat_A = np.empty((len_i,mat_size),dtype=np.float32)
+sub_mat_B = np.empty((len_j,mat_size),dtype=np.float32)
 
 comm.Scatterv([mat_A,count_A,displ_A,MPI.FLOAT],sub_mat_A,root=0)
 comm.Scatterv([mat_B,count_B,displ_B,MPI.FLOAT],sub_mat_B,root=0)
@@ -54,10 +54,9 @@ calc_finish = MPI.Wtime()
 sub_mat_A = None
 sub_mat_B = None
 
+mat_C = None
 if rank == 0:
-    mat_C = np.zeros(mat_size*mat_size,dtype=np.float32)
-else:
-    mat_C = np.zeros(1,dtype=np.float32)
+    mat_C = np.empty(mat_size*mat_size,dtype=np.float32)
 
 count_C = [len_i*len_j for _ in range(size)]
 displ_C = [len_i*len_j*list_rank for list_rank in range(size)]
