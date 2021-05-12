@@ -37,6 +37,7 @@ factor = 2**(int(np.log2(size))%2)
 i_coord = factor * rank // pars_i
 j_coord = rank % pars_j
 
+comm.Barrier()
 io_start = MPI.Wtime()
 
 #Opening and reading matrix A
@@ -53,10 +54,12 @@ fh_B.Read_at_all(offset_B, buf_mat_B)
 mat_B = np.transpose(buf_mat_B)
 fh_B.Close()
 
+comm.Barrier()
 calc_start = MPI.Wtime()
 
 mat_C = FB.sgemm(alpha=1.0, a=buf_mat_A, b=mat_B)
 
+comm.Barrier()
 calc_finish = MPI.Wtime()
 
 buf_mat_C = np.ascontiguousarray(mat_C)
@@ -70,9 +73,9 @@ fh_C.Write_all(buf_mat_C)
 filetype.Free()
 fh_C.Close()
 
+comm.Barrier()
 io_finish = MPI.Wtime()
 
-comm.Barrier()
 
 proc0_total_start = comm.bcast(io_start,root=0)
 
@@ -100,13 +103,14 @@ if rank == 0:
     write_df = pd.read_pickle("Time_dfs/write_df.pkl")
     total_df = pd.read_pickle("Time_dfs/total_df.pkl")
     max_cores = 32
-    core_list = [2**j for j in range(int(np.log2(max_cores))+1)]
+    max_core_power = 6
+    core_list = [2**j for j in range(max_core_power)]
     if size == 1:
         #add a new line with a new val at the left
-        read_df = read_df.append( pd.DataFrame([tuple([read_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
-        calc_df = calc_df.append( pd.DataFrame([tuple([calc_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
-        write_df = write_df.append( pd.DataFrame([tuple([write_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
-        total_df = total_df.append( pd.DataFrame([tuple([total_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)])],columns=core_list, index=[mat_size]) )
+        read_df = read_df.append( pd.DataFrame([[read_time if i==0 else 0.0 for i in range(max_core_power)]],columns=core_list, index=[mat_size]) )
+        calc_df = calc_df.append( pd.DataFrame([[calc_time if i==0 else 0.0 for i in range(max_core_power)]],columns=core_list, index=[mat_size]) )
+        write_df = write_df.append( pd.DataFrame([[write_time if i==0 else 0.0 for i in range(max_core_power)]],columns=core_list, index=[mat_size]) )
+        total_df = total_df.append( pd.DataFrame([[total_time if i==0 else 0.0 for i in range(max_core_power)]],columns=core_list, index=[mat_size]) )
     elif size > 1:
         #add new value at right place
         size_power = int(np.log2(size))

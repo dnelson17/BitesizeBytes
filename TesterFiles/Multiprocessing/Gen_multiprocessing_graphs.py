@@ -32,7 +32,6 @@ def gen_plot(df,p,speedup,pkl_name,func_name):
     else:
         plt.ylabel("Normalised Runtime")
     plt.legend([f"N={n}" if n != "Ideal" else "Ideal" for n in df.columns])
-    p = Path.cwd()
     plt.show()
     #if speedup:
     #    plt.savefig(f"{p.parent.parent}\Figures\Multiprocessing\multiprocessing_{func_name}_{pkl_name}_speedup.png")

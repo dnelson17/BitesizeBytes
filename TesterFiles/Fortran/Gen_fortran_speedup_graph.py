@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+from pathlib import Path
 import pandas as pd
 
 def read_fortran_times():
@@ -15,23 +16,25 @@ def apply_speedup(time_df,core_list):
     return speedup_df
 
 
-def gen_plot(df):
+def gen_plot(df,p):
     df = df.T
     df.plot()
-    plt.xlabel("Number of Processors")
-    plt.ylabel("Runtime Speedup")
+    plt.xlabel("Number of Processors (P)")
+    plt.ylabel("Runtime Speedup (S)")
     plt.legend()
-    plt.show()
-
+    plt.legend([f"N={n}" if n != "Ideal" else "Ideal" for n in df.columns])
+    #plt.show()
+    plt.savefig(f"{p.parent.parent}\Figures\Fortran\Fortran_MPI_speedup.png")
 
 def main():
     max_cores = 6
     core_list = [2**i for i in range(max_cores)]
+    p = Path.cwd()
     fortran_df = read_fortran_times()
     print(f"fortran_df:\n{fortran_df}")
     speedup_df = apply_speedup(fortran_df,core_list)
     print(f"speedup_df:\n{speedup_df}")
-    gen_plot(speedup_df)
+    gen_plot(speedup_df,p)
 
 
 if __name__ == '__main__':

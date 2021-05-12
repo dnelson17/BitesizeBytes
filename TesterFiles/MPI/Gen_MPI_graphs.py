@@ -26,9 +26,9 @@ def apply_speedup(time_df,core_list):
 def gen_plot(df,p,speedup,pkl_name,func_name):
     df = df.T
     df.plot()
-    plt.xlabel("Number of processors (p)")
+    plt.xlabel("Number of processors (P)")
     if speedup:
-        plt.ylabel("Runtime Speedup")
+        plt.ylabel("Runtime Speedup (S)")
     else:
         plt.ylabel("Normalised Runtime")
     plt.legend()
