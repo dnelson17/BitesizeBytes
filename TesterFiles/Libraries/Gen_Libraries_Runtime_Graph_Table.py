@@ -48,8 +48,8 @@ def gen_plot(df,p,lock_val):
     plt.legend()
     #plt.gca().set_aspect('equal')
     p = Path.cwd()
-    #plt.show()
-    plt.savefig(f"{p.parent.parent}\Figures\Libraries\Library_Normalised_Runtimes_{lock_val}.png")
+    plt.show()
+    #plt.savefig(f"{p.parent.parent}\Figures\Libraries\Library_Normalised_Runtimes_{lock_val}.png")
 
 
 def calc_FLOPS(df):

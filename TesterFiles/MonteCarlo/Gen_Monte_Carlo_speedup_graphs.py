@@ -26,12 +26,12 @@ def apply_speedup(time_df,core_list):
 def gen_plot(df,p,speedup):
     df = df.T
     df.plot()
-    plt.xlabel("Number of processors (p)")
+    plt.xlabel("Number of processors (P)")
     if speedup:
-        plt.ylabel("Runtime Speedup")
+        plt.ylabel("Runtime Speedup (S)")
     else:
         plt.ylabel("Normalised Runtime")
-    plt.legend([f"10^{i}" if i != "Ideal" else "Ideal" for i in df.columns])
+    plt.legend([f"N=10^{i}" if i != "Ideal" else "Ideal" for i in df.columns])
     p = Path.cwd()
     if speedup:
         plt.savefig(f"{p.parent.parent}\Figures\MonteCarlo\MonteCarlo_strong_speedup.png")

@@ -31,7 +31,7 @@ def gen_plot(df,p,speedup,pkl_name):
         plt.ylabel("Runtime Speedup")
     else:
         plt.ylabel("Normalised Runtime")
-    plt.legend()
+    plt.legend([f"N={i}" for i in df.columns])
     p = Path.cwd()
     if speedup:
         plt.savefig(f"{p.parent.parent}\Figures\MPI_IO\MPI_IO_{pkl_name}_speedup.png")
@@ -52,14 +52,14 @@ def main():
         print(f"time df: \n{time_df}")
         speedup_df = apply_speedup(time_df,core_list)
         print(f"speedup df: \n{speedup_df}")
-        #gen_plot(speedup_df,p,True,speedup_pkl_name)
+        gen_plot(speedup_df,p,True,speedup_pkl_name)
     for norm_pkl_name in norm_pkl_list:
         print(f"\n\n{norm_pkl_name}")
         time_df = read_df_pickle(f"Time_dfs/{norm_pkl_name}_df.pkl")
         print(f"time df: \n{time_df}")
         norm_df = apply_norm(time_df,0,core_list)
         print(f"norm df: \n{norm_df}")
-        #gen_plot(norm_df,p,False,norm_pkl_name)
+        gen_plot(norm_df,p,False,norm_pkl_name)
 
 
 if __name__ == '__main__':

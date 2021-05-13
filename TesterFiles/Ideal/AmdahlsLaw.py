@@ -13,8 +13,8 @@ for alpha in alpha_list:
     print(f"S(x,{alpha})={max(S(x,alpha))}")
     plt.plot(x, S(x,alpha))
 
-plt.legend(["0%","0.1%","1%","10%","50%"])
-plt.xlabel("Number of Processors")
-plt.ylabel("Runtime Speedup")
+plt.legend(["\u03B1=0% - Ideal","\u03B1=0.1%","\u03B1=1%","\u03B1=10%","\u03B1=50%"])
+plt.xlabel("Number of Processors (P)")
+plt.ylabel("Runtime Speedup (S)")
 p = Path.cwd()
 plt.savefig(f"{p.parent.parent}\Figures\Ideal\AmdahlsLawPercentages.png")
