@@ -30,7 +30,7 @@ def gen_plot(df,p):
     #plt.gca().set_aspect('equal')
     p = Path.cwd()
     #plt.show()
-    plt.savefig(f"{p.parent.parent}\Figures\Libraries\Comparing_Parallel_Runtimes.png")
+    #plt.savefig(f"{p.parent.parent}\Figures\Libraries\Comparing_Parallel_Runtimes.png")
 
 
 def main():
@@ -63,6 +63,8 @@ def main():
     fortran_df.columns = ["Fortran MPI (32 Cores)"]
     print(f"fortran_df: \n{fortran_df}")
     total_df = total_df.join(fortran_df)
+
+    print(f"total_df: \n{total_df.to_string()}")
 
     gen_plot(total_df,p)
 

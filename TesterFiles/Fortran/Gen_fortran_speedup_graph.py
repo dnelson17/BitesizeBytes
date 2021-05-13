@@ -24,7 +24,7 @@ def gen_plot(df,p):
     plt.legend()
     plt.legend([f"N={n}" if n != "Ideal" else "Ideal" for n in df.columns])
     #plt.show()
-    plt.savefig(f"{p.parent.parent}\Figures\Fortran\Fortran_MPI_speedup.png")
+    #plt.savefig(f"{p.parent.parent}\Figures\Fortran\Fortran_MPI_speedup.png")
 
 def main():
     max_cores = 6
