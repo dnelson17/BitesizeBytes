@@ -5,11 +5,6 @@ import numpy as np
 import time
 import sys
 
-# mpiexec -n 4 python MatrixMult.py 4 1
-
-# cd BitesizeBytes/TesterFiles/MPI/MPI_IO
-# /usr/bin/mpiexec -n 4 python3 MatrixMult.py 4 1
-
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
@@ -86,16 +81,20 @@ calc_start += time_difference
 calc_finish += time_difference
 io_finish += time_difference
 
-io_start_min = comm.reduce(io_start, op=MPI.MIN, root=0)
-calc_start_min = comm.reduce(calc_start, op=MPI.MIN, root=0)
-calc_finish_max = comm.reduce(calc_finish, op=MPI.MAX, root=0)
-io_finish_max = comm.reduce(io_finish, op=MPI.MAX, root=0)
+io_start = comm.reduce(io_start, op=MPI.MIN, root=0)
+calc_start = comm.reduce(calc_start, op=MPI.MIN, root=0)
+calc_finish = comm.reduce(calc_finish, op=MPI.MAX, root=0)
+io_finish = comm.reduce(io_finish, op=MPI.MAX, root=0)
 
 if rank == 0:
-    read_time = calc_start_min - io_start_min
-    calc_time = calc_finish_max - calc_start_min
-    write_time = io_finish_max - calc_finish_max
-    total_time = io_finish_max - io_start_min
+    io_start /= size
+    calc_start /= size
+    calc_finish /= size
+    io_finish /= size
+    read_time = calc_start - io_start
+    calc_time = calc_finish - calc_start
+    write_time = io_finish - calc_finish
+    total_time = io_finish - io_start
     assert np.isclose(read_time+calc_time+write_time,total_time)
     #Must update this with whatever the max is in the bash file
     read_df = pd.read_pickle("Time_dfs/read_df.pkl")
