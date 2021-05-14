@@ -33,10 +33,11 @@ def gen_plot(df,p,speedup,pkl_name):
         plt.ylabel("Normalised Runtime")
     plt.legend([f"N={i}" for i in df.columns])
     p = Path.cwd()
-    if speedup:
-        plt.savefig(f"{p.parent.parent}\Figures\MPI_IO\MPI_IO_{pkl_name}_speedup.png")
-    else:
-        plt.savefig(f"{p.parent.parent}\Figures\MPI_IO\MPI_IO_{pkl_name}_norm.png")
+    plt.show()
+    #if speedup:
+    #    plt.savefig(f"{p.parent.parent}\Figures\MPI_IO\MPI_IO_{pkl_name}_speedup.png")
+    #else:
+    #    plt.savefig(f"{p.parent.parent}\Figures\MPI_IO\MPI_IO_{pkl_name}_norm.png")
 
 
 def main():

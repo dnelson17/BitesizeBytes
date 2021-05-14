@@ -81,10 +81,10 @@ calc_start += time_difference
 calc_finish += time_difference
 io_finish += time_difference
 
-io_start = comm.reduce(io_start, op=MPI.MIN, root=0)
-calc_start = comm.reduce(calc_start, op=MPI.MIN, root=0)
-calc_finish = comm.reduce(calc_finish, op=MPI.MAX, root=0)
-io_finish = comm.reduce(io_finish, op=MPI.MAX, root=0)
+io_start = comm.reduce(io_start, op=MPI.SUM, root=0)
+calc_start = comm.reduce(calc_start, op=MPI.SUM, root=0)
+calc_finish = comm.reduce(calc_finish, op=MPI.SUM, root=0)
+io_finish = comm.reduce(io_finish, op=MPI.SUM, root=0)
 
 if rank == 0:
     io_start /= size
