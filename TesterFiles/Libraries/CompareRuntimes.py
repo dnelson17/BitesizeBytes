@@ -33,6 +33,11 @@ def gen_plot(df,p):
     #plt.savefig(f"{p.parent.parent}\Figures\Libraries\Comparing_Parallel_Runtimes.png")
 
 
+def calc_FLOPS(df):
+    flops_df = df.apply(lambda x: (2*x.name-1)*(x.name**2)/(x*(10**12)), axis=1, result_type='expand')
+    return flops_df
+
+
 def main():
     p = Path.cwd()
     
@@ -67,6 +72,9 @@ def main():
     print(f"total_df: \n{total_df.to_string()}")
 
     gen_plot(total_df,p)
+
+    FLOPS_df = calc_FLOPS(total_df)
+    print(FLOPS_df.to_string())
 
 
 if __name__ == '__main__':

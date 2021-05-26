@@ -25,7 +25,7 @@ calc_df = calc_df.sort_index()
 calc_df = calc_df.groupby(calc_df.index).mean()
 norm_calc_df = calc_df.combine(total_df, normalise)
 #print("norm_calc_df")
-#print(norm_calc_df)
+print(norm_calc_df)
 
 write_df = pd.read_pickle("Time_dfs/write_df.pkl")
 write_df = write_df.sort_index()
