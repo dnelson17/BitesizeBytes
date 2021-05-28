@@ -11,7 +11,7 @@ def read_df_pickle(pkl_name):
 
 
 def calc_FLOPS(df):
-    flops_df = df.apply(lambda x: ((10**x.name)*2)/(x*(10**6)), axis=1, result_type='expand')
+    flops_df = df.apply(lambda x: ((10**x.name)*7)/(x*(10**6)), axis=1, result_type='expand')
     return flops_df
 
 

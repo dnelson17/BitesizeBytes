@@ -4,6 +4,7 @@ import random
 import time
 import sys
 
+#This is the parallel Monte Carlo function, so each worker process will be executing this function
 def monte_carlo(attempts):
     i = 0
     hits = 0
@@ -33,7 +34,7 @@ def gen_time_results(attempts, no_cores, scaling_type):
     send_list = [(attempts_split,) for _ in range(no_cores)]
     #Opens a pool of worker processes
     p = Pool(processes=no_cores)
-    #This is where the parallelism is taking place, each worker is given their number of attemps. The "monte_carlo" function will be called on each of them and they will return their number of "hits"
+    #This is where the parallelism is taking place, each worker is given their number of attempts. The "monte_carlo" function will be called on each of them and they will return their number of "hits"
     hits_list = p.starmap(monte_carlo, (send_list))
     #Closes the pool of processes
     p.close()
