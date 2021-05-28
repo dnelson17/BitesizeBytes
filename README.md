@@ -1,6 +1,6 @@
 # BitesizeBytes
  
-LearningFiles - These act of an archive of the different programming concepts that I have persued throughout this report. There are not final finals in this, it act as more of a playground for learning.
+LearningFiles - These act of an archive of the different programming concepts that I have persued throughout this report. There are not final files in this, it act as more of a playground for learning.
 
 TesterFiles - This is where all of my timed Matrix Multiplicaiton and Monte Carlo tests exist. Moreover, all of the graph files are created here.
 
