@@ -30,8 +30,8 @@ pars_j = int(2**(np.floor(power)))
 len_i = int(mat_size/pars_i)
 len_j = int(mat_size/pars_j)
 factor = 2**(int(np.log2(size))%2)
-displ_A = [len_i*mat_size * (factor * list_rank // pars_i) for list_rank in range(size)]
-displ_B = [len_j*mat_size * (list_rank % pars_j) for list_rank in range(size)]
+displ_A = [len_i * (factor * list_rank // pars_i) for list_rank in range(size)]
+displ_B = [len_j * (list_rank % pars_j) for list_rank in range(size)]
 
 sub_mat_A = np.empty((len_i,mat_size),dtype=np.float32)
 sub_mat_B = np.empty((len_j,mat_size),dtype=np.float32)
@@ -69,13 +69,13 @@ displ_C = [len_i*len_j*list_rank for list_rank in range(size)]
 sub_mat_C = np.ascontiguousarray(sub_mat_C, dtype=np.float32)
 comm.Gatherv(sub_mat_C,[mat_C,count_C,displ_C,MPI.FLOAT],root=0)
 
-comm.Barrier()
-total_finish = MPI.Wtime()
-
 if rank == 0:
     mat_C = np.split(mat_C, size, axis=0)
     mat_C = np.apply_along_axis(func1d=np.reshape, axis=1, arr=mat_C, newshape=(len_i,len_j) )
     mat_C = np.vstack( np.split( np.concatenate(mat_C,axis=1) , pars_i, axis=1) )
+
+comm.Barrier()
+total_finish = MPI.Wtime()
 
 #   The matrix mult is now done, everything past this is just saving timing results.
 

@@ -71,7 +71,7 @@ def main():
 
     print(f"total_df: \n{total_df.to_string()}")
 
-    gen_plot(total_df,p)
+    #gen_plot(total_df,p)
 
     FLOPS_df = calc_FLOPS(total_df)
     print(FLOPS_df.to_string())

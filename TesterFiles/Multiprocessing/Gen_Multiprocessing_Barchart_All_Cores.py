@@ -5,7 +5,8 @@ import pandas as pd
 p = Path.cwd()
 max_cores = 6
 core_list = [2**i for i in range(max_cores)]
-func_list = ["MyFunc","Lapack"]
+#func_list = ["MyFunc","Lapack"]
+func_list = ["MyFunc"]
 normalise = lambda x, y: x/y
 
 for func_name in func_list:

@@ -4,22 +4,16 @@ import numpy as np
 import time
 import sys
 
-# ssh -XY 40199787@aigis.mp.qub.ac.uk
-# 
-# ssh aigis06
-# cd BitesizeBytes/LearningPythonMPI
-# /usr/bin/mpiexec -n 4 python3 scatter.py 4 4
-
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
 def matrix_mult(mat_A, mat_B):
-    mat_C = np.zeros((mat_A.shape[0],mat_B.shape[1]))
-    for i in range(len(mat_A)):
-        for j in range(len(mat_B[i])):
-            for k in range(len(mat_B)):
-                mat_C[i,j] += mat_A[i][k] * mat_B[k][j]
+    mat_C = np.zeros((mat_A.shape[0],mat_B.shape[0]),dtype=np.float32)
+    for i in range(mat_A.shape[0]):
+        for j in range(mat_B.shape[0]):
+            for k in range(mat_B.shape[1]):
+                mat_C[i,j] += mat_A[i,k] * mat_B[j,k]
     return mat_C
 
 
@@ -27,44 +21,71 @@ mat_power = int(sys.argv[1])
 mat_size = 2**mat_power
 
 # Initialize the 2 random matrices only if this is rank 0
+mat_A = None
+mat_B = None
 if rank == 0:
     mat_A = np.random.rand(mat_size,mat_size).astype(np.float32)
     mat_B = np.random.rand(mat_size,mat_size).astype(np.float32)
-    #ans = np.matmul(mat_A,mat_B)
+    mat_B = np.transpose(mat_B)
+    mat_B = np.ascontiguousarray(mat_B, dtype=np.float32)
 
+comm.Barrier()
 total_start = MPI.Wtime()
 
+power = np.log2(size)/2
+pars_i = int(2**(np.ceil(power)))
+pars_j = int(2**(np.floor(power)))
+len_i = int(mat_size/pars_i)
+len_j = int(mat_size/pars_j)
+factor = 2**(int(np.log2(size))%2)
+displ_A = [len_i * (factor * list_rank // pars_i) for list_rank in range(size)]
+displ_B = [len_j * (list_rank % pars_j) for list_rank in range(size)]
+
+sub_mat_A = np.empty((len_i,mat_size),dtype=np.float32)
+sub_mat_B = np.empty((len_j,mat_size),dtype=np.float32)
+
 if rank == 0:
-    power = np.log2(size)/2
-    pars_i = int(2**(np.ceil(power)))
-    pars_j = int(2**(np.floor(power)))
-    send_list_A = np.split(mat_A, pars_i, axis=0)
-    send_list_B = np.split(mat_B, pars_j, axis=1)
-    send_list = []
-    for i in range(pars_i):
-        for j in range(pars_j):
-            send_list.append([send_list_A[i],send_list_B[j]])
-    #mat_A = None
-    #mat_B = None
+    for i in range(1,size):
+        comm.Send([mat_A[displ_A[i]:displ_A[i]+len_i],MPI.FLOAT],dest=i,tag=25)
+        comm.Send([mat_B[displ_B[i]:displ_B[i]+len_j],MPI.FLOAT],dest=i,tag=25)
+    sub_mat_A = mat_A[displ_A[0]:displ_A[0]+len_i]
+    sub_mat_B = mat_B[displ_B[0]:displ_B[0]+len_j]
 else:
-    mat_A = None
-    mat_B = None
-    send_list = None
+    comm.Recv([sub_mat_A,MPI.FLOAT],source=0)
+    comm.Recv([sub_mat_B,MPI.FLOAT],source=0)
 
-mats = comm.scatter(send_list,root=0)
+del mat_A
+del mat_B 
 
+comm.Barrier()
 calc_start = MPI.Wtime()
 
-mat_C = matrix_mult(mats[0],mats[1])
+sub_mat_C = matrix_mult(sub_mat_A, sub_mat_B)
 
+comm.Barrier()
 calc_finish = MPI.Wtime()
 
-res_list = comm.gather(mat_C,root=0)
+del sub_mat_A
+del sub_mat_B
+
+mat_C = None
+if rank == 0:
+    mat_C = np.empty(mat_size*mat_size,dtype=np.float32)
+
+count_C = [len_i*len_j for _ in range(size)]
+displ_C = [len_i*len_j*list_rank for list_rank in range(size)]
+sub_mat_C = np.ascontiguousarray(sub_mat_C, dtype=np.float32)
+comm.Gatherv(sub_mat_C,[mat_C,count_C,displ_C,MPI.FLOAT],root=0)
 
 if rank == 0:
-    res = np.vstack( np.split( np.concatenate(res_list,axis=1) , pars_i, axis=1) )
+    mat_C = np.split(mat_C, size, axis=0)
+    mat_C = np.apply_along_axis(func1d=np.reshape, axis=1, arr=mat_C, newshape=(len_i,len_j) )
+    mat_C = np.vstack( np.split( np.concatenate(mat_C,axis=1) , pars_i, axis=1) )
 
+comm.Barrier()
 total_finish = MPI.Wtime()
+
+#   The matrix mult is now done, everything past this is just saving timing results.
 
 proc0_total_start = comm.bcast(total_start,root=0)
 
@@ -94,13 +115,14 @@ if rank == 0:
     gather_df = pd.read_pickle("Time_dfs/gather_df.pkl")
     total_df = pd.read_pickle("Time_dfs/total_df.pkl")
     max_cores = 32
-    core_list = [2**j for j in range(int(np.log2(max_cores))+1)]
+    max_core_power = 6
+    core_list = [2**j for j in range(max_core_power)]
     if size == 1:
         #add a new line with a new val at the left
-        scatter_df = scatter_df.append( pd.DataFrame([[scatter_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        calc_df = calc_df.append( pd.DataFrame([[calc_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        gather_df = gather_df.append( pd.DataFrame([[gather_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
-        total_df = total_df.append( pd.DataFrame([[total_time if i==0 else 0.0 for i in range(int(np.log2(max_cores))+1)]],columns=core_list, index=[mat_size]) )
+        scatter_df = scatter_df.append( pd.DataFrame([[scatter_time if i==0 else 0.0 for i in range(max_core_power)]],columns=core_list, index=[mat_size]) )
+        calc_df = calc_df.append( pd.DataFrame([[calc_time if i==0 else 0.0 for i in range(max_core_power)]],columns=core_list, index=[mat_size]) )
+        gather_df = gather_df.append( pd.DataFrame([[gather_time if i==0 else 0.0 for i in range(max_core_power)]],columns=core_list, index=[mat_size]) )
+        total_df = total_df.append( pd.DataFrame([[total_time if i==0 else 0.0 for i in range(max_core_power)]],columns=core_list, index=[mat_size]) )
     elif size > 1:
         #add new value at right place
         size_power = int(np.log2(size))
@@ -116,3 +138,4 @@ if rank == 0:
     calc_df.to_pickle("Time_dfs/calc_df.pkl")
     gather_df.to_pickle("Time_dfs/gather_df.pkl")
     total_df.to_pickle("Time_dfs/total_df.pkl")
+

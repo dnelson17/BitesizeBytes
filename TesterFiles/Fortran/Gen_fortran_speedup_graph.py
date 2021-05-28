@@ -34,7 +34,7 @@ def main():
     print(f"fortran_df:\n{fortran_df}")
     speedup_df = apply_speedup(fortran_df,core_list)
     print(f"speedup_df:\n{speedup_df}")
-    gen_plot(speedup_df,p)
+    #gen_plot(speedup_df,p)
 
 
 if __name__ == '__main__':
