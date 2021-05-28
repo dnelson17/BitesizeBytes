@@ -52,37 +52,43 @@ def matrix_mult(i,len_i,j,len_j,mat_size,name_A,name_B,name_C):
 
 
 def gen_time_results(mat_size, core_list):
-    mat_shape = (mat_size,mat_size)
-    data_A = np.random.rand(*mat_shape).astype(np.float32)
-    data_B = np.random.rand(*mat_shape).astype(np.float32)
+    #Generates 2 random matrices A,B
+    data_A = np.random.rand((mat_size,mat_size)).astype(np.float32)
+    data_B = np.random.rand((mat_size,mat_size)).astype(np.float32)
+    #Generates empty matrix C for results to be written
     data_C = np.empty((mat_size,mat_size),dtype=np.float32)
+    #Defines shared memory blocks for matrices to be place into
     shm_A = shared_memory.SharedMemory(create=True, size=data_A.nbytes)
     shm_B = shared_memory.SharedMemory(create=True, size=data_B.nbytes)
     shm_C = shared_memory.SharedMemory(create=True, size=data_C.nbytes)
+    #Places matrix A,B,C into shared memory
     mat_A = np.ndarray(data_A.shape, dtype=data_A.dtype, buffer=shm_A.buf)
     mat_A[:] = data_A[:]
     mat_B = np.ndarray(data_B.shape, dtype=data_B.dtype, buffer=shm_B.buf)
     mat_B[:] = data_B[:]
     mat_C = np.ndarray(data_C.shape, dtype=data_C.dtype, buffer=shm_C.buf)
     mat_C[:] = data_C[:]
+    #Gets the name of the sahred memory blocks so that they can be accessed by workers
     name_A = shm_A.name
     name_B = shm_B.name
     name_C = shm_C.name
+    #Define empty lists for various time results to be saved to
     total_times = []
     send_times = []
     calc_times = []
     recv_times = []
+    #A list of cores to run on (typically [1,2,4,8,16,32]) will be passed from the main function. We will now perform the matrix mutlplication on each of these processor counts.
     for no_cores in core_list:
-        print(no_cores)
+        #Resets the values of matrix C to zeros after the previous matrix multiplcation
+        mat_C[:] = np.zeros((mat_size,mat_size),dtype=np.float32)
         #Assuming the matrix is of size 2^n for int N, we take log2 to find the value of n
         power = np.log2(no_cores)/2
-        #Represents the number of partitons that must be calculated in the result matrix C
+        #Represents the number of partitons that must be calculated in the result matrix C, phi_i and phi_j, respectively
         pars_i = int(2**(np.ceil(power)))
         pars_j = int(2**(np.floor(power)))
-        #Represents the size of each partiton in the i and j axis
+        #Represents the size of each partiton in the i and j axis, psi_i and psi_j, respectively
         len_i = int(mat_size/pars_i)
         len_j = int(mat_size/pars_j)
-        send_list = []
         total_start = time.time()
         send_list = [[i,len_i,j,len_j,mat_size,name_A,name_B,name_C] for j in range(pars_j) for i in range(pars_i)]
         p = Pool(processes=no_cores)
