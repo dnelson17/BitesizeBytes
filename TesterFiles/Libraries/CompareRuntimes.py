@@ -21,16 +21,12 @@ def read_fortran_times(path_name):
 
 
 def gen_plot(df,p):
-    #df = df.T
-    print(df.columns)
     df.plot()
     plt.xlabel("Matrix Order (N)")
     plt.ylabel("Runtime (T)")
     plt.legend()
-    #plt.gca().set_aspect('equal')
     p = Path.cwd()
-    #plt.show()
-    #plt.savefig(f"{p.parent.parent}\Figures\Libraries\Comparing_Parallel_Runtimes.png")
+    plt.savefig(f"{p.parent.parent}\Figures\Libraries\Comparing_Parallel_Runtimes.png")
 
 
 def calc_FLOPS(df):
@@ -51,12 +47,6 @@ def main():
     no_lock_df.columns = ["Python Multithreading"]
     print(f"no_lock_df: \n{no_lock_df}")
 
-    print("\n\n")
-    mpi_io_df = read_python_times(f"{p.parent}\MPI_IO/Time_dfs/total_df.pkl")
-    #mpi_io_df = mpi_io_df.drop(["Python dgemm (No Lock)","Numpy MatMul (No Lock)"],axis=1)
-    #mpi_io_df.columns = ["Python Multithreading"]
-    print(f"mpi_io_df: \n{mpi_io_df}")
-
     multiprocessing_df = read_python_times(f"{p.parent}\Multiprocessing/Lapack/Time_dfs/total_df.pkl")
     multiprocessing_df = multiprocessing_df.drop([1,2,4,8,16],axis=1)
     print(multiprocessing_df.columns)
@@ -69,6 +59,13 @@ def main():
     mpi_df.columns = ["Python MPI (32 Cores)"]
     print(f"mpi_df: \n{mpi_df}")
     total_df = total_df.join(mpi_df)
+
+    print("\n\n")
+    mpi_io_df = read_python_times(f"{p.parent}\MPI_IO/Time_dfs/total_df.pkl")
+    mpi_io_df = mpi_io_df.drop([1,2,4,8,16],axis=1)
+    mpi_io_df.columns = ["Python MPI IO (32 Cores)"]
+    print(f"mpi_io_df: \n{mpi_io_df}")
+    total_df = total_df.join(mpi_io_df)
     
     fortran_df = read_fortran_times(f"{p.parent}\Fortran/fortran_results.txt")
     fortran_df.columns = ["Fortran MPI (32 Cores)"]
@@ -77,10 +74,10 @@ def main():
 
     print(f"total_df: \n{total_df.to_string()}")
 
-    #gen_plot(total_df,p)
+    gen_plot(total_df,p)
 
-    #FLOPS_df = calc_FLOPS(total_df)
-    #print(FLOPS_df.to_string())
+    FLOPS_df = calc_FLOPS(total_df)
+    print(FLOPS_df.to_string())
 
 
 if __name__ == '__main__':
